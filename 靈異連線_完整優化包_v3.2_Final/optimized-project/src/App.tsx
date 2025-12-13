@@ -4,8 +4,7 @@ import { useState } from 'react'
  * 靈異連線：蝕骨杏林 - 應用程式入口
  * 
  * 這是一個簡單的引導頁面。
- * 實際的整合範例請參考：src/examples/GhostAppExample.tsx
- * 或者根目錄的 EXAMPLE_LandingPage.tsx
+ * 請參考 README.md 和 INSTALLATION_GUIDE.md 開始整合使用。
  */
 
 function App() {
@@ -39,14 +38,15 @@ function App() {
             <div className="space-y-4 text-text-high">
               <div>
                 <h3 className="text-lg font-semibold mb-2 text-horror-primary">
-                  📖 查看完整範例
+                  📖 閱讀文檔
                 </h3>
                 <p className="mb-2">
-                  完整的整合範例位於：
+                  請參考以下文檔開始使用：
                 </p>
                 <ul className="list-disc list-inside space-y-1 text-sm font-mono bg-bg-deep p-3 rounded">
-                  <li>src/examples/GhostAppExample.tsx</li>
-                  <li>EXAMPLE_LandingPage.tsx (根目錄)</li>
+                  <li>README.md - 專案總覽</li>
+                  <li>QUICKSTART.md - 快速開始指南</li>
+                  <li>INSTALLATION_GUIDE.md - 詳細安裝步驟</li>
                 </ul>
               </div>
 
@@ -56,8 +56,8 @@ function App() {
                 </h3>
                 <ol className="list-decimal list-inside space-y-2 text-sm">
                   <li>複製 src/components 和 src/hooks 到你的專案</li>
-                  <li>參考範例檔案進行整合</li>
-                  <li>閱讀 README.md 和 INSTALLATION_GUIDE.md</li>
+                  <li>參考 INSTALLATION_GUIDE.md 進行整合</li>
+                  <li>設定環境變數（參考 .env.example）</li>
                 </ol>
               </div>
 
@@ -113,21 +113,21 @@ function App() {
           </a>
 
           <a
+            href="./QUICKSTART.md"
+            className="bg-bg-surface border border-horror-primary p-4 rounded text-center hover:bg-bg-deep transition-colors"
+          >
+            <div className="text-2xl mb-2">⚡</div>
+            <div className="font-semibold">快速開始</div>
+            <div className="text-xs text-text-medium mt-1">5 分鐘啟動</div>
+          </a>
+
+          <a
             href="./INSTALLATION_GUIDE.md"
             className="bg-bg-surface border border-horror-primary p-4 rounded text-center hover:bg-bg-deep transition-colors"
           >
             <div className="text-2xl mb-2">🛠️</div>
             <div className="font-semibold">安裝指南</div>
             <div className="text-xs text-text-medium mt-1">詳細步驟</div>
-          </a>
-
-          <a
-            href="./examples/INTEGRATION_EXAMPLE.md"
-            className="bg-bg-surface border border-horror-primary p-4 rounded text-center hover:bg-bg-deep transition-colors"
-          >
-            <div className="text-2xl mb-2">💡</div>
-            <div className="font-semibold">整合範例</div>
-            <div className="text-xs text-text-medium mt-1">實作參考</div>
           </a>
         </div>
 
