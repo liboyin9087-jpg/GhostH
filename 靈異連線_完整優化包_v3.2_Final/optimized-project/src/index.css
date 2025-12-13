@@ -25,6 +25,17 @@
   #root {
     min-height: 100vh;
   }
+
+  /* 改善鍵盤焦點可見性 - UI/UX 改進 */
+  *:focus-visible {
+    outline: 2px solid #00FF41;
+    outline-offset: 2px;
+  }
+
+  /* 按鈕點擊反饋 - UI/UX 改進 */
+  button:active {
+    transform: scale(0.98);
+  }
 }
 
 /* 自訂元件樣式 */
@@ -147,4 +158,21 @@
 
 .loading-spinner {
   animation: spin 1s linear infinite;
+}
+
+/* 尊重用戶的動畫偏好設定 - UI/UX 改進 */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  
+  /* 保持載入動畫可見但減速 */
+  .loading-spinner {
+    animation-duration: 2s !important;
+  }
 }
