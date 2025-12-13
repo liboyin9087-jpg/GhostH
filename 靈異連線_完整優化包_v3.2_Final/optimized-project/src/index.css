@@ -1,0 +1,150 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* 全域樣式 */
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  body {
+    @apply bg-bg-deepest text-text-high;
+    font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  }
+  
+  /* 移除預設的 margin 和 padding */
+  body, html {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+  }
+  
+  #root {
+    min-height: 100vh;
+  }
+}
+
+/* 自訂元件樣式 */
+@layer components {
+  /* 恐怖風格按鈕 */
+  .btn-horror {
+    @apply px-4 py-2 bg-horror-primary text-black font-bold 
+           border-2 border-horror-primary 
+           hover:bg-transparent hover:text-horror-primary
+           transition-all duration-300
+           shadow-horror-glow;
+  }
+  
+  /* 詛咒按鈕 */
+  .btn-cursed {
+    @apply px-6 py-3 bg-horror-secondary text-white font-serif
+           border-4 border-double border-horror-red
+           shadow-horror-red
+           hover:animate-shake
+           transition-all duration-300;
+  }
+  
+  /* 監視器文字 */
+  .text-monitor {
+    @apply font-mono text-horror-primary text-shadow-horror;
+  }
+  
+  /* 符咒文字 */
+  .text-talisman {
+    @apply font-serif text-talisman-red;
+  }
+}
+
+/* 自訂工具類 */
+@layer utilities {
+  /* 隱藏滾動條但保持功能 */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+  
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  
+  /* 自訂滾動條樣式（恐怖風格） */
+  .scrollbar-horror::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .scrollbar-horror::-webkit-scrollbar-track {
+    @apply bg-bg-deep;
+  }
+  
+  .scrollbar-horror::-webkit-scrollbar-thumb {
+    @apply bg-horror-primary rounded;
+  }
+  
+  .scrollbar-horror::-webkit-scrollbar-thumb:hover {
+    @apply bg-horror-secondary;
+  }
+  
+  /* 文字選取顏色 */
+  ::selection {
+    @apply bg-horror-primary text-black;
+  }
+  
+  /* 禁止文字選取（用於遊戲元素） */
+  .no-select {
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
+}
+
+/* CRT 掃描線效果 */
+.crt-scanlines {
+  position: relative;
+}
+
+.crt-scanlines::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%,
+    rgba(0, 0, 0, 0.25) 50%
+  );
+  background-size: 100% 3px;
+  pointer-events: none;
+  z-index: 10;
+}
+
+/* 雜訊效果 */
+@keyframes noise {
+  0%, 100% { background-position: 0 0; }
+  10% { background-position: -5% -10%; }
+  20% { background-position: -15% 5%; }
+  30% { background-position: 7% -25%; }
+  40% { background-position: 20% 25%; }
+  50% { background-position: -25% 10%; }
+  60% { background-position: 15% 5%; }
+  70% { background-position: 0% 15%; }
+  80% { background-position: 25% 35%; }
+  90% { background-position: -10% 10%; }
+}
+
+.noise-bg {
+  animation: noise 1s steps(2) infinite;
+}
+
+/* 載入動畫 */
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.loading-spinner {
+  animation: spin 1s linear infinite;
+}
