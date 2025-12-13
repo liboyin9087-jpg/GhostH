@@ -22,14 +22,23 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
   size = 'md'
 }) => {
   const sizeClasses = {
-    sm: 'w-8 h-8 border-2',
+    sm: 'w-4 h-4 border-2',
     md: 'w-16 h-16 border-4',
     lg: 'w-24 h-24 border-4'
   };
 
-  const containerClass = fullScreen 
-    ? "fixed inset-0 z-modal bg-bg-deepest/90 flex items-center justify-center"
-    : "flex items-center justify-center p-8";
+  if (!fullScreen) {
+    // Inline spinner for buttons
+    return (
+      <div 
+        className={`${sizeClasses[size]} border-current border-t-transparent rounded-full animate-spin`}
+        aria-hidden="true"
+      />
+    );
+  }
+
+  // Full screen spinner
+  const containerClass = "fixed inset-0 z-modal bg-bg-deepest/90 flex items-center justify-center";
 
   return (
     <div className={containerClass} role="status" aria-live="polite">
@@ -38,7 +47,7 @@ export const LoadingSpinner: React.FC<LoadingSpinnerProps> = ({
           className={`${sizeClasses[size]} border-horror-primary border-t-transparent rounded-full animate-spin mx-auto mb-4`}
           aria-hidden="true"
         ></div>
-        <p className="text-text-medium animate-pulse">{message}</p>
+        {message && <p className="text-text-medium animate-pulse">{message}</p>}
         <span className="sr-only">載入中，請稍候...</span>
       </div>
     </div>
