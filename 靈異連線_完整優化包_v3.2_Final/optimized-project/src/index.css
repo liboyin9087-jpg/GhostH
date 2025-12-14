@@ -5,7 +5,7 @@
 /* 全域樣式 */
 @layer base {
   * {
-    @apply border-border;
+    @apply border-bg-surface;
   }
   
   body {

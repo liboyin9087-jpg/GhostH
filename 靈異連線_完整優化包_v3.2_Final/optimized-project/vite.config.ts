@@ -49,13 +49,7 @@ export default defineConfig({
     
     // 優化選項
     chunkSizeWarningLimit: 1000, // 將警告閾值提高到 1000kB
-    minify: 'terser',
-    terserOptions: {
-      compress: {
-        drop_console: true, // 生產環境移除 console
-        drop_debugger: true,
-      },
-    },
+    minify: 'esbuild', // 使用 esbuild 而不是 terser
   },
 
   // 預覽伺服器設定
