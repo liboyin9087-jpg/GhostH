@@ -1,0 +1,114 @@
+name: Deploy to Google Cloud Run
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  workflow_dispatch:
+
+env:
+  PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
+  SERVICE_NAME: ghosth-app
+  REGION: asia-east1
+  IMAGE_NAME: ghosth-horror-game
+
+jobs:
+  deploy:
+    name: Build and Deploy to Cloud Run
+    runs-on: ubuntu-latest
+    
+    permissions:
+      contents: read
+      id-token: write
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+      
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 靈異連線_完整優化包_v3.2_Final/optimized-project/package-lock.json
+      
+      - name: Install dependencies
+        working-directory: 靈異連線_完整優化包_v3.2_Final/optimized-project
+        run: npm ci
+      
+      - name: Run linter
+        working-directory: 靈異連線_完整優化包_v3.2_Final/optimized-project
+        run: npm run lint
+        continue-on-error: true
+      
+      - name: Build application
+        working-directory: 靈異連線_完整優化包_v3.2_Final/optimized-project
+        env:
+          VITE_GEMINI_API_KEY: ${{ secrets.VITE_GEMINI_API_KEY }}
+          VITE_ENABLE_SOUND: true
+          VITE_ENABLE_CRT: true
+        run: npm run build
+      
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v2
+        with:
+          workload_identity_provider: ${{ secrets.WIF_PROVIDER }}
+          service_account: ${{ secrets.WIF_SERVICE_ACCOUNT }}
+      
+      - name: Set up Cloud SDK
+        uses: google-github-actions/setup-gcloud@v2
+      
+      - name: Configure Docker for GCR
+        run: |
+          gcloud auth configure-docker ${{ env.REGION }}-docker.pkg.dev
+      
+      - name: Build Docker image
+        working-directory: 靈異連線_完整優化包_v3.2_Final/optimized-project
+        run: |
+          docker build \
+            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:latest \
+            .
+      
+      - name: Push Docker image to Artifact Registry
+        run: |
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }}
+          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:latest
+      
+      - name: Deploy to Cloud Run
+        run: |
+          gcloud run deploy ${{ env.SERVICE_NAME }} \
+            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/${{ env.SERVICE_NAME }}/${{ env.IMAGE_NAME }}:${{ github.sha }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --allow-unauthenticated \
+            --set-env-vars "VITE_GEMINI_API_KEY=${{ secrets.VITE_GEMINI_API_KEY }},VITE_ENABLE_SOUND=true,VITE_ENABLE_CRT=true" \
+            --memory 512Mi \
+            --cpu 1 \
+            --min-instances 0 \
+            --max-instances 10 \
+            --port 8080 \
+            --timeout 300
+      
+      - name: Get Cloud Run URL
+        id: get-url
+        run: |
+          URL=$(gcloud run services describe ${{ env.SERVICE_NAME }} \
+            --platform managed \
+            --region ${{ env.REGION }} \
+            --format 'value(status.url)')
+          echo "url=$URL" >> $GITHUB_OUTPUT
+          echo "🚀 Deployed to: $URL"
+      
+      - name: Deployment Summary
+        run: |
+          echo "## 🎉 部署成功！" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 部署資訊" >> $GITHUB_STEP_SUMMARY
+          echo "- **服務名稱**: ${{ env.SERVICE_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **區域**: ${{ env.REGION }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **映像標籤**: ${{ github.sha }}" >> $GITHUB_STEP_SUMMARY
+          echo "- **訪問網址**: ${{ steps.get-url.outputs.url }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### 恐怖遊戲已準備好迎接訪客... 👻" >> $GITHUB_STEP_SUMMARY

@@ -67,12 +67,33 @@ npm run dev
 
 詳細步驟請參考：[optimized-project/QUICKSTART.md](./靈異連線_完整優化包_v3.2_Final/optimized-project/QUICKSTART.md)
 
+## 🚀 部署到 Google Cloud Run
+
+本專案已配置自動化部署到 Google Cloud Run：
+
+### 自動部署
+- 推送到 `main` 或 `master` 分支時自動觸發部署
+- 使用 GitHub Actions 自動建置和部署
+- 支援 Workload Identity Federation（無需金鑰）
+
+### 設定步驟
+1. 參考 **[Cloud Run 部署指南](./CLOUD_RUN_DEPLOYMENT_GUIDE.md)** 完成 GCP 設定
+2. 在 GitHub Secrets 中配置必要的環境變數
+3. 推送程式碼即可自動部署
+
+詳細說明：[CLOUD_RUN_DEPLOYMENT_GUIDE.md](./CLOUD_RUN_DEPLOYMENT_GUIDE.md)
+
 ## 📖 文檔
 
-專案內包含三個主要文檔：
+### 專案文檔
 - **[README.md](./靈異連線_完整優化包_v3.2_Final/optimized-project/README.md)** - 專案總覽與功能說明
 - **[QUICKSTART.md](./靈異連線_完整優化包_v3.2_Final/optimized-project/QUICKSTART.md)** - 5 分鐘快速啟動
 - **[INSTALLATION_GUIDE.md](./靈異連線_完整優化包_v3.2_Final/optimized-project/INSTALLATION_GUIDE.md)** - 詳細安裝與整合指南
+
+### 部署與優化文檔
+- **[CLOUD_RUN_DEPLOYMENT_GUIDE.md](./CLOUD_RUN_DEPLOYMENT_GUIDE.md)** - 🚀 Google Cloud Run 部署完整指南
+- **[HORROR_ENHANCEMENT_IDEAS.md](./HORROR_ENHANCEMENT_IDEAS.md)** - 👻 恐怖氛圍強化方案
+- **[UX_UI_IMPROVEMENT_SUGGESTIONS.md](./UX_UI_IMPROVEMENT_SUGGESTIONS.md)** - 🎨 用戶體驗改進建議
 
 ## ⚠️ 注意事項
 
@@ -88,5 +109,6 @@ npm run dev
 
 ---
 
-**最後更新**: 2025-12-13  
-**狀態**: ✅ 已完成解壓縮與清理，可立即使用
+**最後更新**: 2025-12-14  
+**狀態**: ✅ 已完成解壓縮與清理，可立即使用  
+**新功能**: 🚀 自動化 Cloud Run 部署、👻 恐怖氛圍增強方案
