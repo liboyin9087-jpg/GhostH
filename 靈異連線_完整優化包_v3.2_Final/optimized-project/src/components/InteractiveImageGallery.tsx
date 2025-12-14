@@ -134,6 +134,15 @@ const InteractiveImageGallery: React.FC<InteractiveImageGalleryProps> = ({
             key={image.id}
             className="relative group cursor-pointer overflow-hidden rounded-lg border-2 border-stone-800 hover:border-crt-green transition-all duration-300"
             onClick={() => setSelectedImage(image)}
+            role="button"
+            tabIndex={0}
+            onKeyDown={(e) => {
+              if (e.key === 'Enter' || e.key === ' ') {
+                e.preventDefault();
+                setSelectedImage(image);
+              }
+            }}
+            aria-label={`查看圖片：${image.title}，地點：${image.location}`}
           >
             {/* 圖片預覽 */}
             <ImageFilter 
@@ -144,6 +153,7 @@ const InteractiveImageGallery: React.FC<InteractiveImageGalleryProps> = ({
                 <img 
                   src={image.src} 
                   alt={image.title}
+                  loading="lazy"
                   className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500"
                 />
               </div>
@@ -171,11 +181,18 @@ const InteractiveImageGallery: React.FC<InteractiveImageGalleryProps> = ({
         <div 
           className="fixed inset-0 z-[200] bg-black flex items-center justify-center"
           onClick={closeViewer}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="image-viewer-title"
         >
           {/* 關閉提示 */}
-          <div className="absolute top-4 right-4 text-white font-mono text-sm bg-black bg-opacity-60 px-3 py-2 rounded z-10">
-            按 ESC 或點擊任意處關閉
-          </div>
+          <button
+            onClick={closeViewer}
+            className="absolute top-4 right-4 text-white font-mono text-sm bg-black bg-opacity-60 px-3 py-2 rounded z-10 hover:bg-opacity-80 transition-all focus:outline-none focus:ring-2 focus:ring-horror-primary"
+            aria-label="關閉圖片查看器"
+          >
+            按 ESC 或點擊關閉 ✕
+          </button>
 
           {/* 監視器 UI */}
           <div className="w-full h-full relative" onClick={(e) => e.stopPropagation()}>
@@ -250,6 +267,7 @@ const InteractiveImageGallery: React.FC<InteractiveImageGalleryProps> = ({
             {/* 圖片描述（底部覆蓋） */}
             <div className="absolute bottom-16 left-0 right-0 bg-gradient-to-t from-black to-transparent p-6 z-10">
               <h2 
+                id="image-viewer-title"
                 className="text-2xl font-mono mb-2"
                 style={{ color: surveillancePalette.timestamp.text }}
               >

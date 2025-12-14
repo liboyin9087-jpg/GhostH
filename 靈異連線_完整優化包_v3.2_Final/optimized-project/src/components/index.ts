@@ -9,6 +9,8 @@ export { Button } from './Button';
 export { LoadingSpinner } from './LoadingSpinner';
 export { Tooltip } from './Tooltip';
 export { ErrorBoundary } from './ErrorBoundary';
+export { AccessibilitySettings } from './AccessibilitySettings';
+export type { AccessibilityOptions } from './AccessibilitySettings';
 
 // Toast 通知系統
 export { Toast, ToastContainer, useToast as useToastHook } from './Toast';

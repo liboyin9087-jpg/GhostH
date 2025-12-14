@@ -1,4 +1,6 @@
 import { useState } from 'react'
+import { useToast } from './components/ToastProvider'
+import { AccessibilitySettings } from './components/AccessibilitySettings'
 
 /**
  * 靈異連線：蝕骨杏林 - 應用程式入口
@@ -14,9 +16,26 @@ import { useState } from 'react'
 
 function App() {
   const [showInfo, setShowInfo] = useState(true)
+  const { info, success } = useToast()
+
+  const handleCloseInfo = () => {
+    setShowInfo(false)
+    info('你可以隨時重新載入頁面來查看快速開始資訊')
+  }
+
+  const handleDocClick = (docName: string) => {
+    success(`開啟 ${docName} 文檔`)
+  }
 
   return (
     <div className="min-h-screen bg-bg-deepest text-text-high flex items-center justify-center p-4">
+      {/* 無障礙設定按鈕 */}
+      <AccessibilitySettings 
+        onSettingsChange={(settings) => {
+          console.log('Accessibility settings changed:', settings)
+        }}
+      />
+      
       <div className="max-w-3xl w-full">
         {/* 標題 */}
         <header className="text-center mb-12">
@@ -38,7 +57,7 @@ function App() {
                 🎮 快速開始
               </h2>
               <button
-                onClick={() => setShowInfo(false)}
+                onClick={handleCloseInfo}
                 className="text-text-medium hover:text-horror-primary transition-colors focus:outline-none focus:ring-2 focus:ring-horror-primary rounded"
                 aria-label="關閉快速開始資訊"
                 title="關閉"
@@ -118,6 +137,7 @@ function App() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
             <a
               href="./README.md"
+              onClick={() => handleDocClick('README')}
               className="bg-bg-surface border border-horror-primary p-4 rounded text-center hover:bg-bg-deep hover:border-horror-secondary transition-all focus:outline-none focus:ring-2 focus:ring-horror-primary"
               aria-label="閱讀專案 README 文檔"
             >
@@ -128,6 +148,7 @@ function App() {
 
             <a
               href="./QUICKSTART.md"
+              onClick={() => handleDocClick('快速開始')}
               className="bg-bg-surface border border-horror-primary p-4 rounded text-center hover:bg-bg-deep hover:border-horror-secondary transition-all focus:outline-none focus:ring-2 focus:ring-horror-primary"
               aria-label="閱讀快速開始指南"
             >
@@ -138,6 +159,7 @@ function App() {
 
             <a
               href="./INSTALLATION_GUIDE.md"
+              onClick={() => handleDocClick('安裝指南')}
               className="bg-bg-surface border border-horror-primary p-4 rounded text-center hover:bg-bg-deep hover:border-horror-secondary transition-all focus:outline-none focus:ring-2 focus:ring-horror-primary"
               aria-label="閱讀安裝指南"
             >
