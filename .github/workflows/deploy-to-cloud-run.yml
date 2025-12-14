@@ -40,6 +40,8 @@ jobs:
       - name: Run linter
         working-directory: 靈異連線_完整優化包_v3.2_Final/optimized-project
         run: npm run lint
+        # Note: Linting errors are allowed but logged for review
+        # Consider making this a blocking step in production
         continue-on-error: true
       
       - name: Build application

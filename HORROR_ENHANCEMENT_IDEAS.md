@@ -620,12 +620,32 @@ export const WatchingEyes = ({ x, y, size = 40 }) => {
 
 // 使用多個眼睛：
 export const WatchingEyesCluster = () => {
-  const eyePositions = [
-    { x: 100, y: 100 },
-    { x: window.innerWidth - 100, y: 150 },
-    { x: 200, y: window.innerHeight - 100 },
-    { x: window.innerWidth - 150, y: window.innerHeight - 150 }
-  ];
+  const [eyePositions, setEyePositions] = useState<Array<{x: number, y: number}>>([]);
+  
+  useEffect(() => {
+    // 在客戶端渲染時設定眼睛位置
+    const positions = [
+      { x: 100, y: 100 },
+      { x: window.innerWidth - 100, y: 150 },
+      { x: 200, y: window.innerHeight - 100 },
+      { x: window.innerWidth - 150, y: window.innerHeight - 150 }
+    ];
+    setEyePositions(positions);
+    
+    // 處理視窗大小變化
+    const handleResize = () => {
+      const newPositions = [
+        { x: 100, y: 100 },
+        { x: window.innerWidth - 100, y: 150 },
+        { x: 200, y: window.innerHeight - 100 },
+        { x: window.innerWidth - 150, y: window.innerHeight - 150 }
+      ];
+      setEyePositions(newPositions);
+    };
+    
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
+  }, []);
   
   return (
     <>
