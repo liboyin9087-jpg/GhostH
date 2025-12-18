@@ -1,10 +1,13 @@
 # 多階段構建：構建階段
 FROM node:18 AS builder
 
+# 設定專案路徑作為構建參數
+ARG PROJECT_PATH=靈異連線_完整優化包_v3.2_Final/optimized-project
+
 WORKDIR /app
 
 # 複製專案檔案
-COPY 靈異連線_完整優化包_v3.2_Final/optimized-project/ ./
+COPY ${PROJECT_PATH}/ ./
 
 # 安裝依賴並構建
 RUN npm install

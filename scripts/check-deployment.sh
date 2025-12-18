@@ -3,7 +3,7 @@
 # GhostH 部署設定檢查腳本
 # 此腳本檢查 Cloud Run 部署所需的所有設定
 
-set -e
+set -euo pipefail
 
 echo "=========================================="
 echo "  GhostH Cloud Run 部署設定檢查"
@@ -18,7 +18,7 @@ NC='\033[0m' # No Color
 
 # 檢查函數
 check_command() {
-    if command -v $1 &> /dev/null; then
+    if command -v "$1" &> /dev/null; then
         echo -e "${GREEN}✓${NC} $1 已安裝"
         return 0
     else

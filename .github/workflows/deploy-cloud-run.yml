@@ -10,6 +10,7 @@ env:
   PROJECT_ID: ${{ secrets.GCP_PROJECT_ID }}
   SERVICE_NAME: ghosth-spectral-link
   REGION: asia-east1
+  IMAGE_BASE: asia-east1-docker.pkg.dev/${{ secrets.GCP_PROJECT_ID }}/ghosth/spectral-link
 
 jobs:
   deploy:
@@ -38,19 +39,18 @@ jobs:
 
       - name: Build Docker image
         run: |
-          docker build -t ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/ghosth/spectral-link:${{ github.sha }} .
-          docker tag ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/ghosth/spectral-link:${{ github.sha }} \
-                     ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/ghosth/spectral-link:latest
+          docker build -t ${{ env.IMAGE_BASE }}:${{ github.sha }} .
+          docker tag ${{ env.IMAGE_BASE }}:${{ github.sha }} ${{ env.IMAGE_BASE }}:latest
 
       - name: Push Docker image to Artifact Registry
         run: |
-          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/ghosth/spectral-link:${{ github.sha }}
-          docker push ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/ghosth/spectral-link:latest
+          docker push ${{ env.IMAGE_BASE }}:${{ github.sha }}
+          docker push ${{ env.IMAGE_BASE }}:latest
 
       - name: Deploy to Cloud Run
         run: |
           gcloud run deploy ${{ env.SERVICE_NAME }} \
-            --image ${{ env.REGION }}-docker.pkg.dev/${{ env.PROJECT_ID }}/ghosth/spectral-link:${{ github.sha }} \
+            --image ${{ env.IMAGE_BASE }}:${{ github.sha }} \
             --platform managed \
             --region ${{ env.REGION }} \
             --allow-unauthenticated \
