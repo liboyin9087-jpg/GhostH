@@ -1,0 +1,11 @@
+ghosth_file,suggested_demo_object,target_path,note
+obj_08_vhs_found.png,obj_03_vhs,public/assets/objects/found/obj_03_vhs_found.(png/jpg),demo expects .jpg by default; adjust objects.ts if using png
+obj_06_patientmonitor_cutout.png,(no direct match),,demo obj list differs; use as custom asset
+obj_06_patientmonitor_found.png,(no direct match),,
+obj_30_ctscanphoto_cutout.png,(no direct match),,
+obj_30_ctscanphoto_found.png,(no direct match),,
+obj_19_stretcher_cutout.png,(no direct match),,
+obj_02_ivstand_found.png,(no direct match),,
+obj_29_bedsidetable_cutout.png,(no direct match),,
+obj_14_jawbone_found.png,(no direct match),,
+unknown_62547018_found.png,(unknown),,needs identification
