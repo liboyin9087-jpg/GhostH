@@ -12,7 +12,7 @@ import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 export type HauntPhase = "stable" | "warning" | "incident";
 export type IncidentType = "ghost" | "blackout" | "chromatic" | "static" | "tracking";
 export type ThreatLabel = "LOW" | "MED" | "HIGH" | "CRITICAL";
-export type EventName = "scan" | "playback" | "talisman" | "drawer_open" | "idle" | "ghost_near" | "clue_found";
+export type EventName = "scan" | "playback" | "talisman" | "drawer_open" | "idle" | "ghost_near" | "clue_found" | "hotspot";
 
 export interface DirectorState {
   phase: HauntPhase;
@@ -38,6 +38,7 @@ const PRESSURE_DELTAS: Record<EventName, number> = {
   idle: -5,
   ghost_near: 25,
   clue_found: 8,
+  hotspot: 8,
 };
 
 // 事件類型權重（用於隨機選擇）

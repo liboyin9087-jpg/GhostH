@@ -946,11 +946,18 @@ function GameShellInner() {
     audio.playGhost("static");
 
     if (playback.state.phase === "showing") {
-      const clueData = generateClueFromPlayback(playback.state);
+      const timestamp = new Date().toLocaleTimeString().slice(0, 5);
+      const clueData = generateClueFromPlayback(
+        { 
+          src: playback.state.src, 
+          caption: playback.state.caption 
+        },
+        playback.state.timestamp
+      );
       setClues((prev) => [
         {
           ...clueData,
-          time: new Date().toLocaleTimeString().slice(0, 5),
+          time: timestamp,
           isNew: true,
         },
         ...prev,

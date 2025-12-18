@@ -19,6 +19,7 @@ interface HapticPatterns {
   talismanActivate: () => void  // 護符啟動
   talismanSeal: () => void     // 護符封印
   sceneChange: () => void      // 場景切換
+  scan: () => void          // 掃描
 }
 
 export function useHaptics(): HapticPatterns {
@@ -80,6 +81,9 @@ export function useHaptics(): HapticPatterns {
     
     // 場景切換 - 短促過渡感
     sceneChange: useCallback(() => vibrate([30, 80, 50]), [vibrate]),
+    
+    // 掃描 - 持續性的脈衝感
+    scan: useCallback(() => vibrate([25, 25, 25, 25, 25]), [vibrate]),
   }
 }
 
