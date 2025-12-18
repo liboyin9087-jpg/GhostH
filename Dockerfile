@@ -1,14 +1,13 @@
 # 多階段構建：構建階段
-FROM node:18-alpine AS builder
+FROM node:18 AS builder
 
 WORKDIR /app
 
 # 複製專案檔案
-COPY 靈異連線_完整優化包_v3.2_Final/optimized-project/package*.json ./
 COPY 靈異連線_完整優化包_v3.2_Final/optimized-project/ ./
 
 # 安裝依賴並構建
-RUN npm ci --legacy-peer-deps
+RUN npm install
 RUN npm run build
 
 # 生產階段：使用 nginx 提供靜態檔案
