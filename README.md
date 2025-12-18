@@ -4,7 +4,7 @@
 
 ✅ **已完成解壓縮與清理**
 
-這個儲存庫包含《靈異連線：蝕骨杏林》(Ghost Connection: Corroded Hospital) 完整優化包 v3.2 Final。
+這個儲存庫包含《靈異連線：蝕骨杏林》(Ghost Connection: Corroded Hospital) 完整優化包 v4.0。
 
 ## 📁 專案結構
 
@@ -29,7 +29,7 @@
 ## 📊 專案概覽
 
 **類型**: React + TypeScript + Vite 恐怖遊戲  
-**版本**: v3.2 Final (Images Integrated)  
+**版本**: v4.0 (Cloud Run Ready)  
 **用途**: 台灣文化特色恐怖遊戲募資專案
 
 ### 核心內容
@@ -109,6 +109,7 @@ npm run dev
 
 ---
 
-**最後更新**: 2025-12-14  
+**最後更新**: 2025-12-18  
 **狀態**: ✅ 已完成解壓縮與清理，可立即使用  
-**新功能**: 🚀 自動化 Cloud Run 部署、👻 恐怖氛圍增強方案
+**新功能**: 🚀 自動化 Cloud Run 部署、👻 恐怖氛圍增強方案  
+**版本**: v4.0
