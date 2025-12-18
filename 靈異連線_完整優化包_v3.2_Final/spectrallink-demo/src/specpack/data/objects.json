@@ -1,0 +1,227 @@
+[
+  {
+    "id": "obj_01_wheelchair",
+    "name": "輪椅",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "scan"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_01_wheelchair/prop_wheelchair_cutout.png",
+      "found": "/assets/objects/obj_01_wheelchair/prop_wheelchair_found.png"
+    }
+  },
+  {
+    "id": "obj_02_flashlight",
+    "name": "手電筒",
+    "type": "tool",
+    "interaction": [
+      "equip",
+      "inspect"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_02_flashlight/prop_flashlight_cutout.png",
+      "found": "/assets/objects/obj_02_flashlight/prop_flashlight_found.png"
+    }
+  },
+  {
+    "id": "obj_03_vhs",
+    "name": "VHS 錄影帶",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "collect",
+      "playback"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_03_vhs/prop_vhs_cassette_cutout.png",
+      "found": "/assets/objects/obj_03_vhs/prop_vhs_cassette_found.png"
+    }
+  },
+  {
+    "id": "obj_04_cam_battery",
+    "name": "錄影帶電池",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "collect",
+      "use"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_04_cam_battery/prop_camcorder_battery_cutout.png",
+      "found": "/assets/objects/obj_04_cam_battery/prop_camcorder_battery_found.png"
+    }
+  },
+  {
+    "id": "obj_05_morgue_handle",
+    "name": "停屍櫃抽屜把手",
+    "type": "environment",
+    "interaction": [
+      "inspect",
+      "scan"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_05_morgue_handle/prop_morgue_drawer_handle_cutout.png",
+      "found": "/assets/objects/obj_05_morgue_handle/prop_morgue_drawer_handle_found.png"
+    }
+  },
+  {
+    "id": "obj_06_evidence_box",
+    "name": "金屬證物盒",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "open"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_06_evidence_box/prop_metal_evidence_box_cutout.png",
+      "found": "/assets/objects/obj_06_evidence_box/prop_metal_evidence_box_found.png"
+    }
+  },
+  {
+    "id": "obj_07_emergency_button",
+    "name": "緊急按鈕盒",
+    "type": "environment",
+    "interaction": [
+      "inspect",
+      "press"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_07_emergency_button/prop_emergency_button_box_cutout.png",
+      "found": "/assets/objects/obj_07_emergency_button/prop_emergency_button_box_found.png"
+    }
+  },
+  {
+    "id": "obj_08_audio_reel",
+    "name": "錄音帶鐵捲",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "collect",
+      "playback"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_08_audio_reel/prop_audio_tape_reel_cutout.png",
+      "found": "/assets/objects/obj_08_audio_reel/prop_audio_tape_reel_found.png"
+    }
+  },
+  {
+    "id": "obj_09_burnt_docs",
+    "name": "燒毀文件",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "collect"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_09_burnt_docs/prop_burnt_documents_cutout.png",
+      "found": "/assets/objects/obj_09_burnt_docs/prop_burnt_documents_found.png"
+    }
+  },
+  {
+    "id": "obj_10_ash_pile",
+    "name": "灰燼",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "scan"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_10_ash_pile/prop_ash_pile_cutout.png",
+      "found": "/assets/objects/obj_10_ash_pile/prop_ash_pile_found.png"
+    }
+  },
+  {
+    "id": "obj_11_cctv",
+    "name": "CCTV 攝影機",
+    "type": "environment",
+    "interaction": [
+      "inspect",
+      "scan"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_11_cctv/prop_security_camera_cutout.png",
+      "found": "/assets/objects/obj_11_cctv/prop_security_camera_found.png"
+    }
+  },
+  {
+    "id": "obj_12_old_key",
+    "name": "老舊鑰匙",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "collect",
+      "use"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_12_old_key/prop_old_key_cutout.png",
+      "found": "/assets/objects/obj_12_old_key/prop_old_key_found.png"
+    }
+  },
+  {
+    "id": "obj_13_wristband",
+    "name": "病患手環",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "collect"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_13_wristband/prop_patient_wristband_cutout.png",
+      "found": "/assets/objects/obj_13_wristband/prop_patient_wristband_found.png"
+    }
+  },
+  {
+    "id": "obj_14_photo",
+    "name": "破損相片",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "collect"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_14_photo/prop_damaged_photograph_cutout.png",
+      "found": "/assets/objects/obj_14_photo/prop_damaged_photograph_found.png"
+    }
+  },
+  {
+    "id": "obj_15_mirror",
+    "name": "鏡子碎片",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "scan"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_15_mirror/prop_broken_mirror_cutout.png",
+      "found": "/assets/objects/obj_15_mirror/prop_broken_mirror_found.png"
+    }
+  },
+  {
+    "id": "obj_16_medical_tool",
+    "name": "醫療工具",
+    "type": "tool",
+    "interaction": [
+      "inspect",
+      "collect"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_16_medical_tool/prop_medical_tool_cutout.png",
+      "found": "/assets/objects/obj_16_medical_tool/prop_medical_tool_found.png"
+    }
+  },
+  {
+    "id": "obj_17_blood_stain",
+    "name": "地面血跡痕跡物",
+    "type": "evidence",
+    "interaction": [
+      "inspect",
+      "scan"
+    ],
+    "assets": {
+      "cutout": "/assets/objects/obj_17_blood_stain/prop_blood_stain_evidence_cutout.png",
+      "found": "/assets/objects/obj_17_blood_stain/prop_blood_stain_evidence_found.png"
+    }
+  }
+]
