@@ -5,11 +5,15 @@
 
 import React, { useEffect, useState, useMemo, createContext, useContext } from "react";
 import GameShell from "./GameShell";
+import { LocaleProvider } from "./i18n";
 
 // ===== 遊戲設定 Context =====
 interface GameSettings {
   masterVolume: number;
+  musicVolume: number;
   sfxVolume: number;
+  musicEnabled: boolean;
+  sfxEnabled: boolean;
   hapticEnabled: boolean;
   reducedMotion: boolean;
   vhsIntensity: number;
@@ -17,7 +21,10 @@ interface GameSettings {
 
 const defaultSettings: GameSettings = {
   masterVolume: 70,
+  musicVolume: 70,
   sfxVolume: 80,
+  musicEnabled: true,
+  sfxEnabled: true,
   hapticEnabled: true,
   reducedMotion: false,
   vhsIntensity: 75,
@@ -170,15 +177,17 @@ export default function App() {
 
   return (
     <ErrorBoundary>
-      <GameSettingsContext.Provider value={contextValue}>
-        <div
-          className="min-h-screen bg-black flex items-center justify-center overflow-hidden"
-          style={{ minHeight: "100dvh" }}
-        >
-          <GameShell />
-          {showFPS && <FPSCounter />}
-        </div>
-      </GameSettingsContext.Provider>
+      <LocaleProvider>
+        <GameSettingsContext.Provider value={contextValue}>
+          <div
+            className="min-h-screen bg-black flex items-center justify-center overflow-hidden"
+            style={{ minHeight: "100dvh" }}
+          >
+            <GameShell />
+            {showFPS && <FPSCounter />}
+          </div>
+        </GameSettingsContext.Provider>
+      </LocaleProvider>
     </ErrorBoundary>
   );
 }
