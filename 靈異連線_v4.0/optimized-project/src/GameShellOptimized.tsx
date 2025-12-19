@@ -10,9 +10,10 @@
  * 5. 新手引導
  * 6. UI/UX 優化
  * 7. 標題檔案場景整合
+ * 8. 2.5D 走廊過渡系統
  */
 
-import React, { useCallback, useEffect, useMemo, useRef, useState, memo, createContext, useContext } from "react";
+import React, { useCallback, useEffect, useMemo, useRef, useState, memo, createContext, useContext, Suspense, lazy } from "react";
 import { PROPS, SCAN_TYPE_TO_MEDIA, CLUE_DEFAULT_MEDIA } from "./assets/props";
 import { SCENES, SCENE_ORDER, type SceneId } from "./scenes";
 import { SCENE_SCRIPTS } from "./scenesEvents";
@@ -32,6 +33,7 @@ import { PlaybackViewer } from "./components/PlaybackViewer";
 import { TemperatureSensor, EMFMeter, ThreatLevel } from "./components/Sensors";
 import { ToolButton, Toolbar, SpiritBar } from "./components/ToolbarButtons";
 import { TitleArchiveScreen } from "./components/TitleArchiveScreen";
+import { useGameSettings } from "./components/SettingsMenu";
 
 // Hooks
 import { useVHSTimestamp } from "./hooks/useVHSTimestamp";
@@ -39,6 +41,14 @@ import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 import { useHaptics } from "./hooks/useHaptics";
 import { useFearSystem } from "./hooks/useFearSystem";
 import { useAudio } from "./hooks/useAudio";
+import { useSceneTransition, shouldUse3DTransition } from "./hooks/useSceneTransition";
+
+// Dynamic import for 3D corridor (only loaded when needed)
+const CorridorTransition = lazy(() => 
+  import('./components/CorridorTransition').then(module => ({
+    default: module.CorridorTransition
+  }))
+);
 
 type Mode = null | "flashlight" | "scan" | "playback" | "talisman";
 
@@ -662,6 +672,16 @@ function GameShellInner() {
   const timestamp = useVHSTimestamp();
   const audio = useAudio();
   const saveSystem = useSaveSystem();
+  const { settings } = useGameSettings();
+
+  // ===== 場景過渡系統 =====
+  const {
+    transition,
+    startTransition,
+    completeTransition,
+    resetTransition,
+    shouldShow3DTransition,
+  } = useSceneTransition();
 
   // ===== 場景狀態 =====
   const [sceneId, setSceneId] = useState<SceneId>("title_archive");
@@ -839,46 +859,93 @@ function GameShellInner() {
 
       haptics.click?.();
       audio.playUI("click");
-      audio.playVHS("tracking");
 
-      setIsTransitioning(true);
-      setActiveMode(null);
-      setSelectedHotspot(null);
-      setSelectedClue(null);
+      // 檢查是否使用 3D 過渡
+      const use3D = settings.enable3DTransitions && shouldUse3DTransition(sceneId, targetId);
 
-      setTimeout(() => {
-        setSceneId(targetId);
-        setVisitedScenes((prev) =>
-          prev.includes(targetId) ? prev : [...prev, targetId]
-        );
+      if (use3D) {
+        // 使用 3D 走廊過渡
+        audio.playVHS("tracking");
+        startTransition(sceneId, targetId, true);
+        setActiveMode(null);
+        setSelectedHotspot(null);
+        setSelectedClue(null);
+      } else {
+        // 傳統場景切換
+        audio.playVHS("tracking");
+        setIsTransitioning(true);
+        setActiveMode(null);
+        setSelectedHotspot(null);
+        setSelectedClue(null);
 
-        // 切換環境音
-        const sceneAudioMap: Record<SceneId, "corridor" | "nurse" | "morgue"> = {
-          title_archive: "corridor", // 標題場景使用預設音效
-          corridor_b1: "corridor",
-          nurse_station: "nurse",
-          morgue: "morgue",
-        };
-        const loopMap: Record<SceneId, "drip" | "fluorescent" | "fridge"> = {
-          title_archive: "drip", // 標題場景使用預設循環音
-          corridor_b1: "drip",
-          nurse_station: "fluorescent",
-          morgue: "fridge",
-        };
+        setTimeout(() => {
+          setSceneId(targetId);
+          setVisitedScenes((prev) =>
+            prev.includes(targetId) ? prev : [...prev, targetId]
+          );
 
-        audio.playAmbient(sceneAudioMap[targetId]);
-        audio.playLoop(loopMap[targetId]);
+          // 切換環境音
+          const sceneAudioMap: Record<SceneId, "corridor" | "nurse" | "morgue"> = {
+            title_archive: "corridor", // 標題場景使用預設音效
+            corridor_b1: "corridor",
+            nurse_station: "nurse",
+            morgue: "morgue",
+          };
+          const loopMap: Record<SceneId, "drip" | "fluorescent" | "fridge"> = {
+            title_archive: "drip", // 標題場景使用預設循環音
+            corridor_b1: "drip",
+            nurse_station: "fluorescent",
+            morgue: "fridge",
+          };
 
-        setIsTransitioning(false);
-      }, 800);
+          audio.playAmbient(sceneAudioMap[targetId]);
+          audio.playLoop(loopMap[targetId]);
+
+          setIsTransitioning(false);
+        }, 800);
+      }
     },
-    [sceneId, isTransitioning, haptics, audio]
+    [sceneId, isTransitioning, haptics, audio, settings.enable3DTransitions, startTransition]
   );
 
   const nextScene = useCallback(() => {
     const idx = SCENE_ORDER.indexOf(sceneId);
     gotoScene(SCENE_ORDER[(idx + 1) % SCENE_ORDER.length]);
   }, [sceneId, gotoScene]);
+
+  // ===== 3D 過渡完成處理 =====
+  const handle3DTransitionComplete = useCallback(() => {
+    completeTransition();
+
+    // 短暫延遲後切換場景並重置
+    setTimeout(() => {
+      if (transition.toScene) {
+        setSceneId(transition.toScene);
+        setVisitedScenes((prev) =>
+          prev.includes(transition.toScene!) ? prev : [...prev, transition.toScene!]
+        );
+
+        // 切換環境音
+        const sceneAudioMap: Record<SceneId, "corridor" | "nurse" | "morgue"> = {
+          title_archive: "corridor",
+          corridor_b1: "corridor",
+          nurse_station: "nurse",
+          morgue: "morgue",
+        };
+        const loopMap: Record<SceneId, "drip" | "fluorescent" | "fridge"> = {
+          title_archive: "drip",
+          corridor_b1: "drip",
+          nurse_station: "fluorescent",
+          morgue: "fridge",
+        };
+
+        audio.playAmbient(sceneAudioMap[transition.toScene]);
+        audio.playLoop(loopMap[transition.toScene]);
+
+        resetTransition();
+      }
+    }, 500);
+  }, [transition.toScene, completeTransition, resetTransition, audio]);
 
   // ===== 指標追蹤 =====
   const onPointerMove = useCallback(
@@ -1112,10 +1179,39 @@ function GameShellInner() {
   }
 
   return (
-    <div
-      className="relative w-full max-w-md mx-auto h-screen bg-black overflow-hidden select-none"
-      style={{ touchAction: "manipulation" }}
-    >
+    <>
+      {/* ===== 3D 走廊過渡 ===== */}
+      {shouldShow3DTransition() && transition.fromScene && transition.toScene && (
+        <Suspense fallback={
+          <div style={{
+            position: 'fixed',
+            inset: 0,
+            background: '#000',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: '#fff',
+            fontFamily: 'VT323, monospace',
+            fontSize: '18px',
+            letterSpacing: '0.2em',
+            zIndex: 9999
+          }}>
+            <div>▶ LOADING CORRIDOR...</div>
+          </div>
+        }>
+          <CorridorTransition
+            fromScene={transition.fromScene}
+            toScene={transition.toScene}
+            onComplete={handle3DTransitionComplete}
+            reducedMotion={reducedMotion}
+          />
+        </Suspense>
+      )}
+
+      <div
+        className="relative w-full max-w-md mx-auto h-screen bg-black overflow-hidden select-none"
+        style={{ touchAction: "manipulation" }}
+      >
       <VHSOverlaySystem
         phase={director.phase}
         intensity01={director.intensity01}
@@ -1382,7 +1478,8 @@ function GameShellInner() {
           100% { top: 105%; }
         }
       `}</style>
-    </div>
+      </div>
+    </>
   );
 }
 
