@@ -10,6 +10,8 @@ export interface GameSettings {
   vhsStrength: 'low' | 'med' | 'high';
   hapticsEnabled: boolean;
   fontScale: 'small' | 'default' | 'large';
+  difficulty: 'easy' | 'normal' | 'hard'; // 難度設定
+  autoHapticOnScan: boolean;  // 掃描到異常時自動震動
 }
 
 const DEFAULT_SETTINGS: GameSettings = {
@@ -17,6 +19,8 @@ const DEFAULT_SETTINGS: GameSettings = {
   vhsStrength: 'med',
   hapticsEnabled: true,
   fontScale: 'default',
+  difficulty: 'normal',
+  autoHapticOnScan: true,
 };
 
 // 從 localStorage 讀取設定
@@ -306,6 +310,24 @@ const SettingsContent = memo(function SettingsContent({
 }) {
   return (
     <div className="space-y-6">
+      {/* 難度設定 */}
+      <SegmentedControl
+        label="遊戲難度 Difficulty"
+        value={settings.difficulty}
+        onChange={(v) => onUpdateSettings({ difficulty: v })}
+        options={[
+          { value: 'easy', label: '簡單' },
+          { value: 'normal', label: '普通' },
+          { value: 'hard', label: '困難' },
+        ]}
+      />
+
+      <div className="text-xs text-[var(--ui-text-muted)] -mt-4 pl-1">
+        {settings.difficulty === 'easy' && '• 更長的安全期，降低驚嚇頻率'}
+        {settings.difficulty === 'normal' && '• 平衡的恐怖體驗'}
+        {settings.difficulty === 'hard' && '• 更高的壓力值，增加靈異事件'}
+      </div>
+
       {/* 音量 */}
       <Slider
         label="主音量 Master Volume"
@@ -332,6 +354,15 @@ const SettingsContent = memo(function SettingsContent({
         onChange={(v) => onUpdateSettings({ hapticsEnabled: v })}
       />
 
+      {/* 掃描震動 */}
+      {settings.hapticsEnabled && (
+        <Toggle
+          label="掃描異常時震動"
+          value={settings.autoHapticOnScan}
+          onChange={(v) => onUpdateSettings({ autoHapticOnScan: v })}
+        />
+      )}
+
       {/* 字體大小 */}
       <SegmentedControl
         label="字體大小 Font Scale"
@@ -354,7 +385,7 @@ const SettingsContent = memo(function SettingsContent({
 
       {/* 版本資訊 */}
       <div className="text-center text-[var(--ui-text-muted)] text-[10px] pt-2">
-        SPECTRAL LINK v1.0.0 DEMO
+        SPECTRAL LINK v4.0.0 DEMO
       </div>
     </div>
   );

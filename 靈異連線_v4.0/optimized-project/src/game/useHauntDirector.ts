@@ -5,11 +5,14 @@
  * 控制遊戲恐怖節奏：Stable → Warning → Incident
  * 根據玩家行為（掃描、回放、護符、閒置）調整壓力值，
  * 壓力值決定是否觸發靈異事件。
+ * 
+ * v4.0: 新增安全區機制與難度調整支援
  */
 
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { applyDifficultyToPressure, type Difficulty } from "./difficultyModifiers";
 
-export type HauntPhase = "stable" | "warning" | "incident";
+export type HauntPhase = "stable" | "warning" | "incident" | "safe";
 export type IncidentType = "ghost" | "blackout" | "chromatic" | "static" | "tracking";
 export type ThreatLabel = "LOW" | "MED" | "HIGH" | "CRITICAL";
 export type EventName = "scan" | "playback" | "talisman" | "drawer_open" | "idle" | "ghost_near" | "clue_found" | "hotspot";
@@ -20,6 +23,7 @@ export interface DirectorState {
   incidentType: IncidentType; // 當前事件類型
   threatLabel: ThreatLabel;   // UI 威脅等級顯示
   pressure: number;           // 當前壓力值 (debug 用)
+  inSafeZone: boolean;        // 是否在安全區
 }
 
 export interface HauntDirectorOptions {
@@ -27,6 +31,7 @@ export interface HauntDirectorOptions {
   signalStrength: number;   // 0-100
   spiritPower: number;      // 0-100
   batteryLevel?: number;    // 0-100
+  difficulty?: Difficulty;  // 難度設定
 }
 
 // 事件對壓力的影響值
@@ -49,25 +54,33 @@ const INCIDENT_WEIGHTS = {
 };
 
 export function useHauntDirector(opts: HauntDirectorOptions) {
-  const { fearLevel, signalStrength, spiritPower, batteryLevel = 100 } = opts;
+  const { fearLevel, signalStrength, spiritPower, batteryLevel = 100, difficulty = 'normal' } = opts;
 
   const [phase, setPhase] = useState<HauntPhase>("stable");
   const [incidentType, setIncidentType] = useState<IncidentType>("ghost");
+  const [inSafeZone, setInSafeZone] = useState(false);
 
   // 壓力值：0~100，越高越容易觸發 incident
   const pressureRef = useRef(0);
   const lastActionRef = useRef(Date.now());
   const phaseRef = useRef<HauntPhase>(phase);
+  const safeZoneTimerRef = useRef<number | null>(null);
   
   // 同步 phase 到 ref（避免 closure 問題）
   useEffect(() => {
     phaseRef.current = phase;
   }, [phase]);
 
-  // 調整壓力值
+  // 調整壓力值（套用難度修正）
   const bumpPressure = useCallback((delta: number) => {
-    pressureRef.current = Math.max(0, Math.min(100, pressureRef.current + delta));
-  }, []);
+    // 安全區內不累積壓力
+    if (inSafeZone && delta > 0) {
+      return;
+    }
+    
+    const modifiedDelta = applyDifficultyToPressure(delta, difficulty);
+    pressureRef.current = Math.max(0, Math.min(100, pressureRef.current + modifiedDelta));
+  }, [difficulty, inSafeZone]);
 
   // 選擇事件類型（加權隨機）
   const pickIncidentType = useCallback((): IncidentType => {
@@ -113,13 +126,19 @@ export function useHauntDirector(opts: HauntDirectorOptions) {
 
   // VHS 效果強度
   const intensity01 = useMemo(() => {
+    // 安全區內效果減弱
+    if (inSafeZone) {
+      return 0.05; // 最小效果
+    }
+
     // 基礎強度由 phase 決定
     const baseByPhase = {
       stable: 0.15,
       warning: 0.40,
       incident: 0.85,
+      safe: 0.05,
     };
-    const base = baseByPhase[phase];
+    const base = baseByPhase[phase] || 0.15;
 
     // 恐懼加成（最多 +0.30）
     const fearBoost = Math.min(0.30, (fearLevel / 100) * 0.30);
@@ -138,7 +157,7 @@ export function useHauntDirector(opts: HauntDirectorOptions) {
       : 0;
 
     return Math.min(1, base + fearBoost + pressureBoost + signalPenalty + batteryPenalty);
-  }, [phase, fearLevel, signalStrength, batteryLevel]);
+  }, [phase, fearLevel, signalStrength, batteryLevel, inSafeZone]);
 
   // 核心節奏：每秒執行導演決策
   useEffect(() => {
@@ -197,6 +216,34 @@ export function useHauntDirector(opts: HauntDirectorOptions) {
     return () => clearTimeout(timer);
   }, [phase, bumpPressure]);
 
+  // 啟動安全區
+  const startSafeZone = useCallback((durationSeconds: number) => {
+    if (safeZoneTimerRef.current) {
+      clearTimeout(safeZoneTimerRef.current);
+    }
+    
+    setInSafeZone(true);
+    setPhase("safe");
+    
+    // 大幅降低壓力
+    pressureRef.current = Math.max(0, pressureRef.current - 30);
+    
+    safeZoneTimerRef.current = window.setTimeout(() => {
+      setInSafeZone(false);
+      setPhase("stable");
+      safeZoneTimerRef.current = null;
+    }, durationSeconds * 1000);
+  }, []);
+
+  // 清理安全區計時器
+  useEffect(() => {
+    return () => {
+      if (safeZoneTimerRef.current) {
+        clearTimeout(safeZoneTimerRef.current);
+      }
+    };
+  }, []);
+
   // 自然壓力衰減（每 5 秒少量降壓）
   useEffect(() => {
     const decay = setInterval(() => {
@@ -214,6 +261,8 @@ export function useHauntDirector(opts: HauntDirectorOptions) {
     incidentType,
     threatLabel,
     notify,
+    startSafeZone,
+    inSafeZone,
     // Debug / UI 可顯示
     get pressure() {
       return pressureRef.current;

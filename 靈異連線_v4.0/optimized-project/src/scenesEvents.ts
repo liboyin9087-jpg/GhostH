@@ -11,6 +11,9 @@ export interface SceneScript {
   jumpscareChance: number  // 驚嚇事件機率 0-1
   ghostType: 'shadow' | 'figure' | 'face'  // 鬼影類型
   isTitle?: boolean        // 是否為標題場景
+  hasSafeZone?: boolean    // 是否有安全區域（降低緊張感）
+  safeZoneDuration?: number // 安全區持續時間（秒）
+  storyBeat?: 'intro' | 'rising' | 'climax' | 'resolution' // 故事節奏點
 }
 
 export const SCENE_SCRIPTS: Record<SceneId, SceneScript> = {
@@ -24,6 +27,8 @@ export const SCENE_SCRIPTS: Record<SceneId, SceneScript> = {
     jumpscareChance: 0,
     ghostType: 'shadow',
     isTitle: true,
+    hasSafeZone: true,
+    storyBeat: 'intro',
   },
   corridor_b1: {
     danger: 0.45,
@@ -34,6 +39,9 @@ export const SCENE_SCRIPTS: Record<SceneId, SceneScript> = {
     exitHint: '門禁磁條訊號：護理站方向 -->',
     jumpscareChance: 0.15,
     ghostType: 'shadow',
+    hasSafeZone: true,
+    safeZoneDuration: 15, // 進入場景後 15 秒為安全期
+    storyBeat: 'intro',
   },
   nurse_station: {
     danger: 0.65,
@@ -44,6 +52,8 @@ export const SCENE_SCRIPTS: Record<SceneId, SceneScript> = {
     exitHint: '門縫低頻震動（往解剖室）↓',
     jumpscareChance: 0.25,
     ghostType: 'figure',
+    hasSafeZone: false, // 中段無安全區，保持緊張
+    storyBeat: 'rising',
   },
   morgue: {
     danger: 0.85,
@@ -54,6 +64,8 @@ export const SCENE_SCRIPTS: Record<SceneId, SceneScript> = {
     exitHint: '封印後強制中斷連線（Demo End）',
     jumpscareChance: 0.4,
     ghostType: 'face',
+    hasSafeZone: false,
+    storyBeat: 'climax',
   },
 }
 
