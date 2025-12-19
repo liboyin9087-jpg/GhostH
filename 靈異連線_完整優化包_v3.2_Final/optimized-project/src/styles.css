@@ -303,3 +303,54 @@ body { font-family: var(--font-vhs); -webkit-font-smoothing: antialiased; }
     opacity: 1;
   }
 }
+
+/* Scene Transition Animations */
+@keyframes fadeInOut {
+  0% {
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0;
+  }
+}
+
+@keyframes blurTransition {
+  0% {
+    backdrop-filter: blur(0px);
+  }
+  50% {
+    backdrop-filter: blur(20px);
+  }
+  100% {
+    backdrop-filter: blur(0px);
+  }
+}
+
+@keyframes noiseFlash {
+  0%,
+  100% {
+    opacity: 0;
+  }
+  30%,
+  70% {
+    opacity: 0.4;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes loadingProgress {
+  0% {
+    width: 0%;
+  }
+  100% {
+    width: 100%;
+  }
+}

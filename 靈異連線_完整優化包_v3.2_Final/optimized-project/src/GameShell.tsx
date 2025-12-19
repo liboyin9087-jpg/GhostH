@@ -25,12 +25,18 @@ import { ScanResultCard } from "./components/ScanResultCard";
 import { PlaybackViewer } from "./components/PlaybackViewer";
 import { TemperatureSensor, EMFMeter, ThreatLevel } from "./components/Sensors";
 import { ToolButton, Toolbar, SpiritBar } from "./components/ToolbarButtons";
+import { SettingsMenu, useGameSettings, type GameSettings as SettingsType } from "./components/SettingsMenu";
+import { SceneTransition } from "./components/SceneTransition";
 
 // Hooks
 import { useVHSTimestamp } from "./hooks/useVHSTimestamp";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
 import { useHaptics } from "./hooks/useHaptics";
 import { useFearSystem } from "./hooks/useFearSystem";
+import { useLocale } from "./i18n";
+
+// Utils
+import { saveGame, loadGame, hasSaveData, type GameSaveData } from "./utils/saveLoadManager";
 
 type Mode = null | "flashlight" | "scan" | "playback" | "talisman";
 
@@ -45,30 +51,6 @@ const nowHHMM = () => {
 interface ExtendedClue extends Clue {
   mediaKey?: string;
 }
-
-// ===== 場景轉場效果 =====
-const SceneTransition = memo(function SceneTransition({ active }: { active: boolean }) {
-  if (!active) return null;
-  
-  return (
-    <div className="absolute inset-0 z-[100] pointer-events-none overflow-hidden">
-      <div className="absolute inset-0 bg-black" />
-      <div
-        className="absolute inset-0"
-        style={{
-          backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E")`,
-          opacity: 0.4,
-          animation: "noiseShift 0.1s steps(8) infinite",
-        }}
-      />
-      <div className="absolute inset-0 flex items-center justify-center">
-        <div className="text-stone-400 text-sm tracking-[0.2em] font-mono">
-          ▶ LOADING...
-        </div>
-      </div>
-    </div>
-  );
-});
 
 // ===== 線索詳情檢視 =====
 const ClueDetailView = memo(function ClueDetailView({
@@ -138,11 +120,18 @@ const ClueDetailView = memo(function ClueDetailView({
   );
 });
 
+// Расширенные типы для клю
+interface ExtendedClue extends Clue {
+  mediaKey?: string;
+}
+
 // ===== 主遊戲介面 =====
 export default function GameShell() {
   const reducedMotion = usePrefersReducedMotion();
   const haptics = useHaptics();
   const timestamp = useVHSTimestamp();
+  const { language, t, setLanguage } = useLocale();
+  const { settings: userSettings, updateSettings: updateUserSettings, resetSettings } = useGameSettings();
 
   // ===== 場景狀態 =====
   const [sceneId, setSceneId] = useState<SceneId>("corridor_b1");
@@ -153,6 +142,7 @@ export default function GameShell() {
   const [activeMode, setActiveMode] = useState<Mode>(null);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [showTalisman, setShowTalisman] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
 
   // ===== 資源數值 =====
   const [signalStrength, setSignalStrength] = useState(72);
@@ -387,6 +377,85 @@ export default function GameShell() {
     setSignalStrength((s) => clamp(s + 20, 10, 100));
   }, [haptics]);
 
+  // ===== 存檔/讀檔功能 =====
+  const handleSave = useCallback(() => {
+    const success = saveGame({
+      sceneId,
+      signalStrength,
+      batteryLevel,
+      spiritPower,
+      clues: clues.map(c => ({
+        title: c.title,
+        description: c.description,
+        time: c.time,
+        isNew: c.isNew,
+        mediaKey: c.mediaKey,
+      })),
+      objective,
+      settings: {
+        masterVolume: userSettings.masterVolume,
+        musicVolume: userSettings.musicVolume,
+        sfxVolume: userSettings.sfxVolume,
+        musicEnabled: userSettings.musicEnabled,
+        sfxEnabled: userSettings.sfxEnabled,
+        vhsStrength: userSettings.vhsStrength,
+        hapticsEnabled: userSettings.hapticsEnabled,
+        fontScale: userSettings.fontScale,
+      },
+    });
+
+    if (success) {
+      console.log('Game saved successfully');
+    }
+  }, [sceneId, signalStrength, batteryLevel, spiritPower, clues, objective, userSettings]);
+
+  const handleLoad = useCallback(() => {
+    const saveData = loadGame();
+    if (!saveData) {
+      console.warn('No save data found');
+      return;
+    }
+
+    // Restore game state
+    setSceneId(saveData.sceneId);
+    setSignalStrength(saveData.signalStrength);
+    setBatteryLevel(saveData.batteryLevel);
+    setSpiritPower(saveData.spiritPower);
+    setClues(saveData.clues);
+    setObjective(saveData.objective);
+
+    // Restore settings if available
+    if (saveData.settings) {
+      updateUserSettings({
+        masterVolume: saveData.settings.masterVolume,
+        musicVolume: saveData.settings.musicVolume,
+        sfxVolume: saveData.settings.sfxVolume,
+        musicEnabled: saveData.settings.musicEnabled,
+        sfxEnabled: saveData.settings.sfxEnabled,
+        vhsStrength: saveData.settings.vhsStrength,
+        hapticsEnabled: saveData.settings.hapticsEnabled,
+        fontScale: saveData.settings.fontScale,
+      });
+    }
+
+    console.log('Game loaded successfully');
+  }, [updateUserSettings]);
+
+  // ===== 設定選單處理 =====
+  const handleSettingsClose = useCallback(() => {
+    setSettingsOpen(false);
+  }, []);
+
+  const handleResume = useCallback(() => {
+    setSettingsOpen(false);
+  }, []);
+
+  const handleQuit = useCallback(() => {
+    if (confirm('確定要結束遊戲嗎？未儲存的進度將會遺失。')) {
+      window.location.reload();
+    }
+  }, []);
+
   // ===== 抽屜開關 =====
   const toggleDrawer = useCallback(() => {
     haptics.click();
@@ -613,7 +682,16 @@ export default function GameShell() {
         </div>
 
         {/* ===== 場景轉場 ===== */}
-        <SceneTransition active={isTransitioning} />
+        <SceneTransition active={isTransitioning} type="blur" duration={700} />
+
+        {/* ===== 設定按鈕 ===== */}
+        <button
+          onClick={() => setSettingsOpen(true)}
+          className="absolute top-[180px] right-14 z-[70] w-10 h-10 rounded-lg bg-stone-900/50 border border-stone-700/40 flex items-center justify-center text-lg hover:bg-stone-800/60 transition-all"
+          aria-label="設定"
+        >
+          ⚙️
+        </button>
 
         {/* ===== 場景切換按鈕（開發用，可移除）===== */}
         <button
@@ -623,6 +701,33 @@ export default function GameShell() {
         >
           🚪
         </button>
+
+        {/* ===== 設定選單 ===== */}
+        <SettingsMenu
+          isOpen={settingsOpen}
+          onClose={handleSettingsClose}
+          settings={{
+            masterVolume: userSettings.masterVolume,
+            musicVolume: userSettings.musicVolume,
+            sfxVolume: userSettings.sfxVolume,
+            musicEnabled: userSettings.musicEnabled,
+            sfxEnabled: userSettings.sfxEnabled,
+            vhsStrength: userSettings.vhsStrength,
+            hapticsEnabled: userSettings.hapticsEnabled,
+            fontScale: userSettings.fontScale,
+          }}
+          onUpdateSettings={(partial) => {
+            updateUserSettings(partial as Partial<typeof userSettings>);
+          }}
+          onResetSettings={resetSettings}
+          onResume={handleResume}
+          onQuit={handleQuit}
+          onSave={handleSave}
+          onLoad={handleLoad}
+          hasSaveData={hasSaveData()}
+          language={language}
+          onLanguageChange={setLanguage}
+        />
       </VHSOverlaySystem>
     </div>
   );

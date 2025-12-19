@@ -3,7 +3,7 @@
  * Provides access to localized strings
  */
 
-import { useState, useCallback, useEffect, createContext, useContext } from 'react';
+import React, { useState, useCallback, useEffect, createContext, useContext } from 'react';
 import { locales, type Language, type LocaleStrings } from './locales';
 
 interface LocaleContextType {
