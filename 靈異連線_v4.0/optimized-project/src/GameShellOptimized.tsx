@@ -1159,16 +1159,21 @@ function GameShellInner() {
         >
           {/* 場景背景 */}
           <div className="absolute inset-0">
-            <img
-              src={SCENES[sceneId].src}
-              alt={SCENES[sceneId].label}
-              draggable={false}
-              className="w-full h-full object-cover"
-              style={{
-                opacity: 0.92,
-                filter: `saturate(${1 - fearState.colorDesaturation})`,
-              }}
-            />
+            <picture>
+              {SCENES[sceneId].srcWebp && (
+                <source srcSet={SCENES[sceneId].srcWebp} type="image/webp" />
+              )}
+              <img
+                src={SCENES[sceneId].src}
+                alt={SCENES[sceneId].label}
+                draggable={false}
+                className="w-full h-full object-cover"
+                style={{
+                  opacity: 0.92,
+                  filter: `saturate(${1 - fearState.colorDesaturation})`,
+                }}
+              />
+            </picture>
             <div
               className="absolute inset-0"
               style={{

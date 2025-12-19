@@ -4,6 +4,7 @@ export type SceneId = 'title_archive' | 'corridor_b1' | 'nurse_station' | 'morgu
 export interface SceneConfig {
   id: SceneId
   src: string
+  srcWebp?: string  // WebP 優化版本
   label: string
   cameraId: string
   bgAudio?: string
@@ -22,6 +23,7 @@ export const SCENES: Record<SceneId, SceneConfig> = {
   corridor_b1: {
     id: 'corridor_b1',
     src: '/images/scenes/scene01_corridor.png',
+    srcWebp: '/images/scenes/webp/scene01_corridor.webp',
     label: '杏林醫院 B1F - 舊病房走廊',
     cameraId: 'CAM-B1-01',
     bgAudio: '/audio/ambient/amb_corridor.mp3',
@@ -30,6 +32,7 @@ export const SCENES: Record<SceneId, SceneConfig> = {
   nurse_station: {
     id: 'nurse_station',
     src: '/images/scenes/scene02_nurse_station.png',
+    srcWebp: '/images/scenes/webp/scene02_nurse_station.webp',
     label: '杏林醫院 1F - 護理站',
     cameraId: 'CAM-1F-NS',
     bgAudio: '/audio/ambient/amb_nurse.mp3',
@@ -38,6 +41,7 @@ export const SCENES: Record<SceneId, SceneConfig> = {
   morgue: {
     id: 'morgue',
     src: '/images/scenes/scene05_morgue.png',
+    srcWebp: '/images/scenes/webp/scene05_morgue.webp',
     label: '杏林醫院 B2F - 太平間',
     cameraId: 'CAM-B2-MG',
     bgAudio: '/audio/ambient/amb_morgue.mp3',

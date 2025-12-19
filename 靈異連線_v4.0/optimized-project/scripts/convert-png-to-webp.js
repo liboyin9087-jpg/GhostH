@@ -12,7 +12,9 @@ const TARGET_DIRS = [
   'public/images/hotspots'
 ];
 
-const WEBP_QUALITY = 80;
+// Higher quality for scene images (85-90), lower for hotspots (75-80)
+const WEBP_QUALITY_SCENES = 88;
+const WEBP_QUALITY_HOTSPOTS = 78;
 
 /**
  * Recursively find all PNG files in a directory
@@ -46,14 +48,20 @@ async function findPngFiles(dir, baseDir, results = []) {
 /**
  * Convert a PNG file to WebP format
  */
-async function convertToWebp(sourcePath, targetPath) {
+async function convertToWebp(sourcePath, targetPath, isScene = false) {
   try {
     // Ensure target directory exists
     await mkdir(dirname(targetPath), { recursive: true });
     
-    // Convert PNG to WebP
+    // Choose quality based on image type
+    const quality = isScene ? WEBP_QUALITY_SCENES : WEBP_QUALITY_HOTSPOTS;
+    
+    // Convert PNG to WebP with optimized settings
     await sharp(sourcePath)
-      .webp({ quality: WEBP_QUALITY })
+      .webp({ 
+        quality: quality,
+        effort: 6  // Higher compression effort (0-6)
+      })
       .toFile(targetPath);
     
     return true;
@@ -76,6 +84,7 @@ async function convertPngToWebp() {
   
   for (const targetDir of TARGET_DIRS) {
     const fullTargetDir = join(projectRoot, targetDir);
+    const isSceneDir = targetDir.includes('scenes');
     console.log(`📁 Processing: ${targetDir}`);
     
     // Find all PNG files
@@ -99,7 +108,7 @@ async function convertPngToWebp() {
       
       console.log(`   Converting: ${relativePath} → webp/${relativeDir}/${webpFilename}`);
       
-      const success = await convertToWebp(sourcePath, webpTargetPath);
+      const success = await convertToWebp(sourcePath, webpTargetPath, isSceneDir);
       
       if (success) {
         totalConverted++;
