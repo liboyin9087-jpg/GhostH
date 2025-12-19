@@ -1,12 +1,16 @@
 /**
  * 《靈異連線》設定選單
- * Settings Menu - Demo Version
+ * Settings Menu - Enhanced Version with Audio Controls, Save/Load, and Language Support
  */
 
 import React, { useState, useEffect, useCallback, memo } from 'react';
 
 export interface GameSettings {
   masterVolume: number;      // 0-100
+  musicVolume: number;       // 0-100
+  sfxVolume: number;         // 0-100
+  musicEnabled: boolean;
+  sfxEnabled: boolean;
   vhsStrength: 'low' | 'med' | 'high';
   hapticsEnabled: boolean;
   fontScale: 'small' | 'default' | 'large';
@@ -14,6 +18,10 @@ export interface GameSettings {
 
 const DEFAULT_SETTINGS: GameSettings = {
   masterVolume: 70,
+  musicVolume: 70,
+  sfxVolume: 80,
+  musicEnabled: true,
+  sfxEnabled: true,
   vhsStrength: 'med',
   hapticsEnabled: true,
   fontScale: 'default',
@@ -175,6 +183,11 @@ interface SettingsMenuProps {
   onResetSettings: () => void;
   onResume?: () => void;
   onQuit?: () => void;
+  onSave?: () => void;
+  onLoad?: () => void;
+  hasSaveData?: boolean;
+  language?: 'zh-TW' | 'en-US';
+  onLanguageChange?: (lang: 'zh-TW' | 'en-US') => void;
 }
 
 export const SettingsMenu = memo(function SettingsMenu({
@@ -185,8 +198,14 @@ export const SettingsMenu = memo(function SettingsMenu({
   onResetSettings,
   onResume,
   onQuit,
+  onSave,
+  onLoad,
+  hasSaveData = false,
+  language = 'zh-TW',
+  onLanguageChange,
 }: SettingsMenuProps) {
   const [activeTab, setActiveTab] = useState<'settings' | 'pause'>('pause');
+  const [saveMessage, setSaveMessage] = useState<string>('');
 
   if (!isOpen) return null;
 
@@ -235,12 +254,33 @@ export const SettingsMenu = memo(function SettingsMenu({
         {/* Content */}
         <div className="p-4 max-h-[60vh] overflow-y-auto">
           {activeTab === 'pause' ? (
-            <PauseContent onResume={onResume} onQuit={onQuit} />
+            <PauseContent 
+              onResume={onResume} 
+              onQuit={onQuit}
+              onSave={() => {
+                if (onSave) {
+                  onSave();
+                  setSaveMessage('✓ 遊戲已儲存');
+                  setTimeout(() => setSaveMessage(''), 2000);
+                }
+              }}
+              onLoad={() => {
+                if (onLoad) {
+                  onLoad();
+                  setSaveMessage('✓ 遊戲已讀取');
+                  setTimeout(() => setSaveMessage(''), 2000);
+                }
+              }}
+              hasSaveData={hasSaveData}
+              saveMessage={saveMessage}
+            />
           ) : (
             <SettingsContent
               settings={settings}
               onUpdateSettings={onUpdateSettings}
               onResetSettings={onResetSettings}
+              language={language}
+              onLanguageChange={onLanguageChange}
             />
           )}
         </div>
@@ -261,9 +301,17 @@ export const SettingsMenu = memo(function SettingsMenu({
 const PauseContent = memo(function PauseContent({
   onResume,
   onQuit,
+  onSave,
+  onLoad,
+  hasSaveData,
+  saveMessage,
 }: {
   onResume?: () => void;
   onQuit?: () => void;
+  onSave?: () => void;
+  onLoad?: () => void;
+  hasSaveData?: boolean;
+  saveMessage?: string;
 }) {
   return (
     <div className="space-y-3">
@@ -277,12 +325,37 @@ const PauseContent = memo(function PauseContent({
         </div>
       </div>
 
+      {saveMessage && (
+        <div className="text-center py-2 text-[var(--ui-emerald)] text-sm animate-fadeIn">
+          {saveMessage}
+        </div>
+      )}
+
       <button
         onClick={onResume}
         className="w-full py-3 rounded-xl bg-[var(--ui-emerald-soft)] border border-[var(--ui-emerald)] text-[var(--ui-emerald)] font-medium tracking-wide transition-all hover:bg-[var(--ui-emerald)] hover:text-black"
       >
         ▶ 繼續遊戲
       </button>
+
+      {onSave && (
+        <button
+          onClick={onSave}
+          className="w-full py-3 rounded-xl bg-[var(--ui-bg-soft)] border border-[var(--ui-border)] text-[var(--ui-text-secondary)] font-medium tracking-wide transition-all hover:border-[var(--ui-emerald)] hover:text-[var(--ui-emerald)]"
+        >
+          💾 儲存遊戲
+        </button>
+      )}
+
+      {onLoad && (
+        <button
+          onClick={onLoad}
+          disabled={!hasSaveData}
+          className="w-full py-3 rounded-xl bg-[var(--ui-bg-soft)] border border-[var(--ui-border)] text-[var(--ui-text-secondary)] font-medium tracking-wide transition-all hover:border-[var(--ui-cyan)] hover:text-[var(--ui-cyan)] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:border-[var(--ui-border)] disabled:hover:text-[var(--ui-text-secondary)]"
+        >
+          📂 讀取遊戲
+        </button>
+      )}
 
       <button
         onClick={onQuit}
@@ -299,19 +372,57 @@ const SettingsContent = memo(function SettingsContent({
   settings,
   onUpdateSettings,
   onResetSettings,
+  language,
+  onLanguageChange,
 }: {
   settings: GameSettings;
   onUpdateSettings: (partial: Partial<GameSettings>) => void;
   onResetSettings: () => void;
+  language?: 'zh-TW' | 'en-US';
+  onLanguageChange?: (lang: 'zh-TW' | 'en-US') => void;
 }) {
   return (
     <div className="space-y-6">
-      {/* 音量 */}
+      {/* 主音量 */}
       <Slider
         label="主音量 Master Volume"
         value={settings.masterVolume}
         onChange={(v) => onUpdateSettings({ masterVolume: v })}
       />
+
+      {/* 背景音樂 */}
+      <div className="space-y-2">
+        <Toggle
+          label="背景音樂 Background Music"
+          value={settings.musicEnabled}
+          onChange={(v) => onUpdateSettings({ musicEnabled: v })}
+        />
+        {settings.musicEnabled && (
+          <Slider
+            label="音樂音量 Music Volume"
+            value={settings.musicVolume}
+            onChange={(v) => onUpdateSettings({ musicVolume: v })}
+            showValue={true}
+          />
+        )}
+      </div>
+
+      {/* 音效 */}
+      <div className="space-y-2">
+        <Toggle
+          label="音效 Sound Effects"
+          value={settings.sfxEnabled}
+          onChange={(v) => onUpdateSettings({ sfxEnabled: v })}
+        />
+        {settings.sfxEnabled && (
+          <Slider
+            label="音效音量 SFX Volume"
+            value={settings.sfxVolume}
+            onChange={(v) => onUpdateSettings({ sfxVolume: v })}
+            showValue={true}
+          />
+        )}
+      </div>
 
       {/* VHS 強度 */}
       <SegmentedControl
@@ -343,6 +454,19 @@ const SettingsContent = memo(function SettingsContent({
           { value: 'large', label: '大' },
         ]}
       />
+
+      {/* 語言切換 */}
+      {onLanguageChange && (
+        <SegmentedControl
+          label="語言 Language"
+          value={language || 'zh-TW'}
+          onChange={onLanguageChange}
+          options={[
+            { value: 'zh-TW', label: '繁體中文' },
+            { value: 'en-US', label: 'English' },
+          ]}
+        />
+      )}
 
       {/* 重置 */}
       <button
