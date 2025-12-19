@@ -1,0 +1,246 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    
+    <!-- 基本 Meta -->
+    <title>靈異連線 | Spectral Link</title>
+    <meta name="description" content="1990年代台灣廢棄醫院恐怖探索遊戲。透過 VHS 攝影機視角，揭開杏林醫院的靈異事件真相。" />
+    <meta name="keywords" content="恐怖遊戲, 台灣, 醫院, VHS, 靈異, horror game, Taiwan" />
+    <meta name="author" content="GhostH Studio" />
+    
+    <!-- 主題色彩 -->
+    <meta name="theme-color" content="#000000" />
+    <meta name="msapplication-navbutton-color" content="#000000" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    
+    <!-- iOS 優化 -->
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="靈異連線" />
+    <meta name="format-detection" content="telephone=no" />
+    
+    <!-- Android 優化 -->
+    <meta name="mobile-web-app-capable" content="yes" />
+    
+    <!-- Open Graph / 社交分享 -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="靈異連線 | Spectral Link" />
+    <meta property="og:description" content="1990年代台灣廢棄醫院恐怖探索遊戲" />
+    <meta property="og:image" content="/images/og-cover.png" />
+    <meta property="og:locale" content="zh_TW" />
+    
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="靈異連線 | Spectral Link" />
+    <meta name="twitter:description" content="1990年代台灣廢棄醫院恐怖探索遊戲" />
+    
+    <!-- Favicon -->
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png" />
+    <link rel="icon" type="image/png" sizes="16x16" href="/favicon-16x16.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
+    
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json" />
+    
+    <!-- 字體預連接 -->
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    
+    <!-- 字體載入 -->
+    <link href="https://fonts.googleapis.com/css2?family=VT323&family=Noto+Sans+TC:wght@400;500;700;900&display=swap" rel="stylesheet" />
+    
+    <!-- 預載入關鍵資源 -->
+    <link rel="preload" href="/images/scenes/scene01_corridor.png" as="image" />
+    
+    <!-- 載入畫面樣式 -->
+    <style>
+      * { box-sizing: border-box; margin: 0; padding: 0; }
+      
+      html, body {
+        height: 100%;
+        background: #000;
+        color: #fff;
+        font-family: 'VT323', monospace;
+        overflow: hidden;
+        -webkit-tap-highlight-color: transparent;
+        -webkit-touch-callout: none;
+        -webkit-user-select: none;
+        user-select: none;
+      }
+      
+      #root {
+        height: 100%;
+      }
+      
+      /* 載入畫面 */
+      #loading-screen {
+        position: fixed;
+        inset: 0;
+        background: #000;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 9999;
+        transition: opacity 0.5s ease, visibility 0.5s ease;
+      }
+      
+      #loading-screen.hidden {
+        opacity: 0;
+        visibility: hidden;
+      }
+      
+      .loading-title {
+        font-size: 28px;
+        letter-spacing: 0.3em;
+        color: rgba(255, 255, 255, 0.85);
+        margin-bottom: 8px;
+        text-shadow: 0 0 20px rgba(16, 185, 129, 0.3);
+      }
+      
+      .loading-subtitle {
+        font-size: 14px;
+        letter-spacing: 0.2em;
+        color: rgba(16, 185, 129, 0.7);
+        margin-bottom: 40px;
+      }
+      
+      .loading-bar-container {
+        width: 200px;
+        height: 4px;
+        background: rgba(50, 50, 50, 0.8);
+        border-radius: 2px;
+        overflow: hidden;
+        margin-bottom: 16px;
+      }
+      
+      .loading-bar {
+        height: 100%;
+        width: 30%;
+        background: linear-gradient(90deg, #10b981, #34d399);
+        border-radius: 2px;
+        animation: loading-progress 1.5s ease-in-out infinite;
+      }
+      
+      .loading-text {
+        font-size: 12px;
+        letter-spacing: 0.15em;
+        color: rgba(150, 150, 150, 0.8);
+        animation: blink 1s ease-in-out infinite;
+      }
+      
+      .loading-warning {
+        position: absolute;
+        bottom: 60px;
+        font-size: 11px;
+        color: rgba(239, 68, 68, 0.7);
+        letter-spacing: 0.1em;
+        text-align: center;
+        padding: 0 20px;
+      }
+      
+      /* VHS 效果 */
+      .vhs-lines {
+        position: absolute;
+        inset: 0;
+        background: repeating-linear-gradient(
+          0deg,
+          transparent 0px,
+          transparent 2px,
+          rgba(0, 0, 0, 0.1) 2px,
+          rgba(0, 0, 0, 0.1) 4px
+        );
+        pointer-events: none;
+      }
+      
+      @keyframes loading-progress {
+        0% { transform: translateX(-100%); }
+        50% { transform: translateX(250%); }
+        100% { transform: translateX(-100%); }
+      }
+      
+      @keyframes blink {
+        0%, 100% { opacity: 1; }
+        50% { opacity: 0.5; }
+      }
+      
+      /* 螢幕方向提示 */
+      @media screen and (orientation: landscape) and (max-height: 500px) {
+        #orientation-warning {
+          display: flex !important;
+        }
+      }
+      
+      #orientation-warning {
+        display: none;
+        position: fixed;
+        inset: 0;
+        background: #000;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        z-index: 10000;
+      }
+      
+      .rotate-icon {
+        font-size: 48px;
+        margin-bottom: 20px;
+        animation: rotate-hint 2s ease-in-out infinite;
+      }
+      
+      @keyframes rotate-hint {
+        0%, 100% { transform: rotate(0deg); }
+        25% { transform: rotate(-15deg); }
+        75% { transform: rotate(15deg); }
+      }
+    </style>
+  </head>
+  <body>
+    <!-- 載入畫面 -->
+    <div id="loading-screen">
+      <div class="vhs-lines"></div>
+      <div class="loading-title">靈異連線</div>
+      <div class="loading-subtitle">SPECTRAL LINK</div>
+      <div class="loading-bar-container">
+        <div class="loading-bar"></div>
+      </div>
+      <div class="loading-text">▶ LOADING...</div>
+      <div class="loading-warning">
+        ⚠ 本遊戲包含恐怖元素，建議配戴耳機遊玩
+      </div>
+    </div>
+    
+    <!-- 螢幕方向提示 -->
+    <div id="orientation-warning">
+      <div class="rotate-icon">📱</div>
+      <div style="color: rgba(255,255,255,0.8); font-size: 14px; letter-spacing: 0.1em;">
+        請將裝置轉為直向模式
+      </div>
+    </div>
+    
+    <!-- React 根節點 -->
+    <div id="root"></div>
+    
+    <!-- 主程式 -->
+    <script type="module" src="/src/main.tsx"></script>
+    
+    <!-- 隱藏載入畫面 -->
+    <script>
+      window.addEventListener('load', function() {
+        // 確保最少顯示 1 秒載入畫面
+        setTimeout(function() {
+          var loader = document.getElementById('loading-screen');
+          if (loader) {
+            loader.classList.add('hidden');
+            // 完全移除元素
+            setTimeout(function() {
+              loader.remove();
+            }, 500);
+          }
+        }, 1000);
+      });
+    </script>
+  </body>
+</html>
