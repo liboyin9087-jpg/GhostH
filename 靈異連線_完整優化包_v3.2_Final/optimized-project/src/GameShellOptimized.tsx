@@ -748,6 +748,9 @@ function GameShellInner() {
     // 播放環境音
     audio.playAmbient("corridor");
     audio.playLoop("drip");
+    
+    // 播放背景音樂（低音量持續循環）
+    audio.playBGM(0.12);
   }, []);
 
   // ===== 自動存檔 =====

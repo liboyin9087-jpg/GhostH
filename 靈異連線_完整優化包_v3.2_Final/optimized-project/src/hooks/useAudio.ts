@@ -26,6 +26,7 @@ interface AudioPaths {
     fluorescent: string
     fridge: string
     heartbeat: string
+    tension: string
   }
   // UI 音效
   ui: {
@@ -72,6 +73,7 @@ const AUDIO_PATHS: AudioPaths = {
     fluorescent: '/audio/loops/loop_fluorescent.mp3',
     fridge: '/audio/loops/loop_fridge.mp3',
     heartbeat: '/audio/loops/loop_heartbeat.mp3',
+    tension: '/audio/loops/loop_tension.mp3',
   },
   ui: {
     click: '/audio/ui/ui_click.mp3',
@@ -109,6 +111,8 @@ export function useAudio() {
   const ambientRef = useRef<HTMLAudioElement | null>(null)
   // 當前循環音
   const loopRef = useRef<HTMLAudioElement | null>(null)
+  // 背景音樂
+  const bgmRef = useRef<HTMLAudioElement | null>(null)
   // 是否靜音
   const mutedRef = useRef(false)
   // 主音量
@@ -253,6 +257,29 @@ export function useAudio() {
   }, [])
 
   /**
+   * 播放背景音樂（持續循環）
+   */
+  const playBGM = useCallback((volume = 0.15) => {
+    const src = AUDIO_PATHS.loops.tension
+    
+    // 如果已經在播放，不重複播放
+    if (bgmRef.current && !bgmRef.current.paused) return
+
+    bgmRef.current = play(src, { volume, loop: true, fadeIn: 2000 })
+  }, [play])
+
+  /**
+   * 停止背景音樂
+   */
+  const stopBGM = useCallback(() => {
+    if (bgmRef.current) {
+      fadeAudioOut(bgmRef.current, 1500, () => {
+        bgmRef.current = null
+      })
+    }
+  }, [])
+
+  /**
    * 播放 UI 音效
    */
   const playUI = useCallback((type: keyof typeof AUDIO_PATHS.ui) => {
@@ -306,6 +333,9 @@ export function useAudio() {
     if (loopRef.current) {
       loopRef.current.volume = 0.2 * masterVolumeRef.current
     }
+    if (bgmRef.current) {
+      bgmRef.current.volume = 0.15 * masterVolumeRef.current
+    }
   }, [])
 
   /**
@@ -316,9 +346,11 @@ export function useAudio() {
     if (mutedRef.current) {
       if (ambientRef.current) ambientRef.current.volume = 0
       if (loopRef.current) loopRef.current.volume = 0
+      if (bgmRef.current) bgmRef.current.volume = 0
     } else {
       if (ambientRef.current) ambientRef.current.volume = 0.3 * masterVolumeRef.current
       if (loopRef.current) loopRef.current.volume = 0.2 * masterVolumeRef.current
+      if (bgmRef.current) bgmRef.current.volume = 0.15 * masterVolumeRef.current
     }
     return mutedRef.current
   }, [])
@@ -364,6 +396,10 @@ export function useAudio() {
         loopRef.current.pause()
         loopRef.current = null
       }
+      if (bgmRef.current) {
+        bgmRef.current.pause()
+        bgmRef.current = null
+      }
       // 清理緩存
       audioCache.current.forEach(audio => {
         audio.pause()
@@ -382,6 +418,9 @@ export function useAudio() {
     // 循環音控制
     playLoop,
     stopLoop,
+    // 背景音樂控制
+    playBGM,
+    stopBGM,
     // 分類播放
     playUI,
     playTalisman,
