@@ -12,6 +12,7 @@ export interface GameSettings {
   fontScale: 'small' | 'default' | 'large';
   difficulty: 'easy' | 'normal' | 'hard'; // 難度設定
   autoHapticOnScan: boolean;  // 掃描到異常時自動震動
+  enable3DTransitions: boolean; // 啟用 3D 走廊過渡
 }
 
 const DEFAULT_SETTINGS: GameSettings = {
@@ -21,6 +22,7 @@ const DEFAULT_SETTINGS: GameSettings = {
   fontScale: 'default',
   difficulty: 'normal',
   autoHapticOnScan: true,
+  enable3DTransitions: true,
 };
 
 // 從 localStorage 讀取設定
@@ -362,6 +364,17 @@ const SettingsContent = memo(function SettingsContent({
           onChange={(v) => onUpdateSettings({ autoHapticOnScan: v })}
         />
       )}
+
+      {/* 3D 過渡效果 */}
+      <Toggle
+        label="3D 走廊過渡 (實驗性)"
+        value={settings.enable3DTransitions}
+        onChange={(v) => onUpdateSettings({ enable3DTransitions: v })}
+      />
+
+      <div className="text-xs text-[var(--ui-text-muted)] -mt-4 pl-1">
+        • 在場景切換時使用第一人稱 3D 走廊
+      </div>
 
       {/* 字體大小 */}
       <SegmentedControl
