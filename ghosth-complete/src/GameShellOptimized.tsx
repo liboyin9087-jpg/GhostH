@@ -78,6 +78,7 @@ interface GameSaveData {
 
 // ===== 場景熱點定義 =====
 const SCENE_HOTSPOTS: Record<SceneId, Hotspot[]> = {
+  title_archive: [], // 標題場景由 TitleArchiveScreen 組件處理熱點
   corridor_b1: [
     {
       id: "wheelchair",
@@ -853,11 +854,13 @@ function GameShellInner() {
 
         // 切換環境音
         const sceneAudioMap: Record<SceneId, "corridor" | "nurse" | "morgue"> = {
+          title_archive: "corridor", // 標題場景使用走廊音效
           corridor_b1: "corridor",
           nurse_station: "nurse",
           morgue: "morgue",
         };
         const loopMap: Record<SceneId, "drip" | "fluorescent" | "fridge"> = {
+          title_archive: "drip", // 標題場景使用滴水音效
           corridor_b1: "drip",
           nurse_station: "fluorescent",
           morgue: "fridge",

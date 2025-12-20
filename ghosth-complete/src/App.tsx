@@ -4,7 +4,7 @@
  */
 
 import React, { useEffect, useState, useMemo, createContext, useContext } from "react";
-import GameShell from "./GameShell";
+import GameShellOptimized from "./GameShellOptimized";
 
 // ===== 遊戲設定 Context =====
 interface GameSettings {
@@ -175,7 +175,7 @@ export default function App() {
           className="min-h-screen bg-black flex items-center justify-center overflow-hidden"
           style={{ minHeight: "100dvh" }}
         >
-          <GameShell />
+          <GameShellOptimized />
           {showFPS && <FPSCounter />}
         </div>
       </GameSettingsContext.Provider>

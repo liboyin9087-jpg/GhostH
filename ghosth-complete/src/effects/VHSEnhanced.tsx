@@ -491,9 +491,12 @@ export const VHSEnhanced = memo(function VHSEnhanced({
 
 // ===== 簡化版 VHS Hook =====
 export function useVHSEffect(phase: HauntPhase, intensity: number) {
-  const [config, setConfig] = useState({
-    glitchLevel: 'subtle' as const,
-    colorGrade: 'green' as const,
+  const [config, setConfig] = useState<{
+    glitchLevel: 'none' | 'subtle' | 'moderate' | 'intense'
+    colorGrade: 'neutral' | 'green' | 'warm' | 'cold'
+  }>({
+    glitchLevel: 'subtle',
+    colorGrade: 'green',
   })
 
   useEffect(() => {
