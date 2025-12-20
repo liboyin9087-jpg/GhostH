@@ -1,0 +1,11 @@
+filename,label,desc_zh,certainty,width,height,sha1
+assets/images/uploaded/obj_08_vhs_found.png,obj_08_vhs_found,VHS錄影帶（Found）,確定,512,512,302748e16431
+assets/images/uploaded/obj_30_ctscanphoto_found.png,obj_30_ctscanphoto_found,腦部/胸腔X光片（Found）,大致,512,512,e5a77af0a10a
+assets/images/uploaded/obj_30_ctscanphoto_cutout.png,obj_30_ctscanphoto_cutout,腦部/胸腔X光片（Cutout）,大致,512,512,3b01412b6f1e
+assets/images/uploaded/obj_19_stretcher_cutout.png,obj_19_stretcher_cutout,推床/擔架床（Cutout）,大致,512,512,1e21325942f8
+assets/images/uploaded/obj_06_tvcrt_found.png,obj_06_tvcrt_found,老舊CRT電視（Found）,確定,512,512,3a6fbc388877
+assets/images/uploaded/obj_06_patientmonitor_cutout.png,obj_06_patientmonitor_cutout,病患監視器/生理監測器（Cutout）,確定,512,512,73bd86371ba3
+assets/images/uploaded/unknown_01_found.png,unknown_01_found,不明物件（Found）—看起來像污漬床墊/板狀物,需你確認,512,512,ba16c86c798d
+assets/images/uploaded/unknown_02_found.png,unknown_02_found,不明場景（Found）—托盤＋牙模/器械,需你確認,512,512,58f75bbfefc9
+assets/images/uploaded/obj_29_bedsidetable_cutout.png,obj_29_bedsidetable_cutout,床邊櫃（Cutout）,確定,512,512,e082a5480f40
+assets/images/uploaded/obj_02_ivstand_found.png,obj_02_ivstand_found,吊點滴架（Found）,確定,512,512,a1082ecbbcd3

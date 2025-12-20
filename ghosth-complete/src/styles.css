@@ -1,0 +1,513 @@
+/**
+ * 《靈異連線》Spectral Link - Optimized Styles v4.0
+ * 整合版樣式表 - 包含 3D 效果支援
+ */
+
+/* ===== CSS 變數 ===== */
+:root {
+  /* 基礎 UI 色彩 */
+  --ui-bg: rgba(10, 14, 12, 0.92);
+  --ui-bg-soft: rgba(15, 20, 18, 0.75);
+  --ui-border: rgba(120, 130, 125, 0.35);
+  --ui-border-soft: rgba(120, 130, 125, 0.20);
+  --ui-border-active: rgba(16, 185, 129, 0.65);
+
+  /* 文字色彩 */
+  --ui-text-primary: rgba(235, 235, 235, 0.92);
+  --ui-text-secondary: rgba(190, 190, 190, 0.65);
+  --ui-text-muted: rgba(160, 160, 160, 0.45);
+
+  /* 功能色彩 */
+  --ui-emerald: rgba(52, 211, 153, 0.90);
+  --ui-cyan: rgba(34, 211, 238, 0.95);
+  --ui-amber: rgba(245, 158, 11, 0.95);
+  --ui-red: rgba(239, 68, 68, 0.95);
+  --ui-purple: rgba(139, 92, 246, 0.95);
+
+  /* 背景 */
+  --color-bg: #000000;
+
+  /* 字體 */
+  --font-vhs: 'VT323', 'Courier New', monospace;
+  --font-chinese: 'Noto Sans TC', 'Microsoft JhengHei', sans-serif;
+  --font-mono: 'JetBrains Mono', 'SF Mono', monospace;
+
+  /* 過渡 */
+  --transition-fast: 150ms;
+  --transition-normal: 300ms;
+  --transition-slow: 500ms;
+
+  /* 3D 效果 */
+  --perspective-default: 1000px;
+  --transform-origin: 50% 50%;
+}
+
+/* ===== 基礎重置 ===== */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  height: 100%;
+  overflow: hidden;
+}
+
+body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: var(--color-bg);
+  color: var(--ui-text-primary);
+  font-family: var(--font-vhs);
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  overflow: hidden;
+  touch-action: manipulation;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+#root {
+  height: 100%;
+  width: 100%;
+  overflow: hidden;
+}
+
+/* ===== 字體樣式 ===== */
+.text-vhs { font-family: var(--font-vhs); }
+.text-chinese { font-family: var(--font-chinese); }
+.text-mono { font-family: var(--font-mono); }
+
+/* ===== 3D 效果基礎 ===== */
+.preserve-3d {
+  transform-style: preserve-3d;
+}
+
+.perspective {
+  perspective: var(--perspective-default);
+  perspective-origin: var(--transform-origin);
+}
+
+.gpu-accelerate {
+  will-change: transform, opacity;
+  transform: translateZ(0);
+  backface-visibility: hidden;
+}
+
+/* ===== VHS 效果動畫 ===== */
+@keyframes scanline-move {
+  0% { top: -5%; }
+  100% { top: 105%; }
+}
+
+@keyframes rgb-scroll {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(18px); }
+}
+
+@keyframes noise-shift {
+  0%, 100% { transform: translate(0, 0); }
+  20% { transform: translate(-2%, 2%); }
+  40% { transform: translate(2%, -2%); }
+  60% { transform: translate(-1%, 1%); }
+  80% { transform: translate(1%, -1%); }
+}
+
+@keyframes tracking-x {
+  0% { transform: translateX(-12%); opacity: 0; }
+  50% { transform: translateX(12%); opacity: 1; }
+  100% { transform: translateX(-12%); opacity: 0; }
+}
+
+@keyframes ghost-flicker {
+  0% { opacity: 0; transform: translate(-50%, -50%) scale(0.95); }
+  35% { opacity: 0.9; }
+  100% { opacity: 0; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+@keyframes warning-pulse {
+  0%, 100% { box-shadow: inset 0 0 30px rgba(239, 68, 68, 0); }
+  50% { box-shadow: inset 0 0 60px rgba(239, 68, 68, 0.25); }
+}
+
+@keyframes heartbeat {
+  0%, 100% { transform: scale(1); }
+  14% { transform: scale(1.15); }
+  28% { transform: scale(1); }
+  42% { transform: scale(1.08); }
+  56% { transform: scale(1); }
+}
+
+@keyframes breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+}
+
+@keyframes pulse-ring {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(1.8); opacity: 0; }
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% center; }
+  100% { background-position: 200% center; }
+}
+
+@keyframes sensor-blink {
+  0%, 90%, 100% { opacity: 1; }
+  95% { opacity: 0.3; }
+}
+
+/* ===== 3D 專用動畫 ===== */
+@keyframes float-3d {
+  0%, 100% {
+    transform: translateY(0) translateZ(0) rotateX(0deg);
+  }
+  50% {
+    transform: translateY(-10px) translateZ(20px) rotateX(5deg);
+  }
+}
+
+@keyframes rotate-3d {
+  from { transform: rotateY(0deg); }
+  to { transform: rotateY(360deg); }
+}
+
+@keyframes depth-pulse {
+  0%, 100% { transform: translateZ(0); }
+  50% { transform: translateZ(30px); }
+}
+
+@keyframes parallax-drift {
+  0%, 100% {
+    transform: translate(0, 0) translateZ(0);
+  }
+  25% {
+    transform: translate(5px, -3px) translateZ(10px);
+  }
+  50% {
+    transform: translate(-3px, 5px) translateZ(5px);
+  }
+  75% {
+    transform: translate(-5px, -2px) translateZ(15px);
+  }
+}
+
+/* ===== 粒子動畫 ===== */
+@keyframes particle-rise {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg);
+    opacity: 0;
+  }
+  10% { opacity: 1; }
+  90% { opacity: 0.8; }
+  100% {
+    transform: translateY(-100vh) translateX(20px) rotate(360deg);
+    opacity: 0;
+  }
+}
+
+@keyframes particle-glow {
+  0%, 100% {
+    box-shadow: 0 0 5px currentColor;
+    opacity: 0.5;
+  }
+  50% {
+    box-shadow: 0 0 15px currentColor, 0 0 25px currentColor;
+    opacity: 1;
+  }
+}
+
+@keyframes spirit-drift {
+  0%, 100% {
+    transform: translate(0, 0) scale(1);
+    opacity: 0.3;
+  }
+  25% {
+    transform: translate(15px, -10px) scale(1.1);
+    opacity: 0.7;
+  }
+  50% {
+    transform: translate(-10px, 5px) scale(0.9);
+    opacity: 0.5;
+  }
+  75% {
+    transform: translate(5px, -15px) scale(1.05);
+    opacity: 0.6;
+  }
+}
+
+/* ===== UI 元件樣式 ===== */
+.btn {
+  appearance: none;
+  border: 1px solid var(--ui-border);
+  background: linear-gradient(180deg, rgba(25, 25, 25, 0.9) 0%, rgba(15, 15, 15, 0.95) 100%);
+  color: #fff;
+  border-radius: 12px;
+  padding: 10px 12px;
+  font-family: inherit;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  min-height: 64px;
+  position: relative;
+  overflow: hidden;
+  transition: all var(--transition-normal) ease;
+  -webkit-tap-highlight-color: transparent;
+  transform-style: preserve-3d;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.05) 0%, transparent 50%);
+  pointer-events: none;
+}
+
+.btn:hover:not(:disabled) {
+  background: linear-gradient(180deg, rgba(35, 35, 35, 0.95) 0%, rgba(25, 25, 25, 0.98) 100%);
+  border-color: rgba(150, 150, 150, 0.5);
+  transform: translateY(-2px) translateZ(5px);
+}
+
+.btn:active:not(:disabled) {
+  transform: translateY(1px) translateZ(0) scale(0.98);
+}
+
+.btn[aria-pressed="true"] {
+  border-color: var(--ui-border-active);
+  background: linear-gradient(180deg, rgba(16, 185, 129, 0.15) 0%, rgba(16, 185, 129, 0.08) 100%);
+  box-shadow: 0 0 0 1px rgba(16, 185, 129, 0.2), 0 4px 20px rgba(16, 185, 129, 0.15);
+}
+
+.btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+  filter: grayscale(0.5);
+}
+
+/* ===== 感測器面板 ===== */
+.sensor-panel {
+  padding: 8px 10px;
+  background: linear-gradient(135deg, rgba(20, 20, 20, 0.85) 0%, rgba(10, 10, 10, 0.9) 100%);
+  border: 1px solid rgba(80, 80, 80, 0.3);
+  border-radius: 8px;
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+}
+
+.sensor-panel--danger {
+  border-color: rgba(239, 68, 68, 0.5);
+  animation: warning-pulse 2s ease-in-out infinite;
+}
+
+/* ===== REC 指示燈 ===== */
+.rec-indicator {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.rec-indicator__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  background: #dc2626;
+  box-shadow: 0 0 8px rgba(220, 38, 38, 0.6);
+  animation: sensor-blink 2s ease-in-out infinite;
+}
+
+.rec-indicator--unstable .rec-indicator__dot {
+  animation: heartbeat 0.8s ease-in-out infinite;
+}
+
+/* ===== 進度條 ===== */
+.progress-bar {
+  height: 8px;
+  background: rgba(40, 40, 40, 0.9);
+  border-radius: 999px;
+  overflow: hidden;
+  border: 1px solid rgba(80, 80, 80, 0.3);
+}
+
+.progress-bar__fill {
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+  position: relative;
+}
+
+.progress-bar__fill::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 50%;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, transparent 100%);
+  border-radius: 999px 999px 0 0;
+}
+
+.progress-bar--spirit .progress-bar__fill {
+  background: linear-gradient(90deg, rgba(180, 83, 9, 0.95), rgba(245, 158, 11, 0.95));
+  box-shadow: 0 0 10px rgba(245, 158, 11, 0.3);
+}
+
+.progress-bar--danger .progress-bar__fill {
+  background: linear-gradient(90deg, rgba(185, 28, 28, 0.95), rgba(239, 68, 68, 0.95));
+  animation: heartbeat 1s ease-in-out infinite;
+}
+
+/* ===== 3D 熱點樣式 ===== */
+.hotspot-3d {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  transform-style: preserve-3d;
+}
+
+.hotspot-3d:hover {
+  transform: translateZ(30px) scale(1.1);
+}
+
+.hotspot-3d__glow {
+  position: absolute;
+  inset: -8px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(16, 185, 129, 0.3) 0%, transparent 70%);
+  animation: depth-pulse 2s ease-in-out infinite;
+  pointer-events: none;
+}
+
+/* ===== 場景轉場效果 ===== */
+.scene-transition {
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1),
+              opacity 0.5s ease,
+              filter 0.5s ease;
+  transform-style: preserve-3d;
+}
+
+.scene-transition--exiting {
+  transform: translateZ(-300px) rotateX(10deg);
+  opacity: 0;
+  filter: blur(10px);
+}
+
+.scene-transition--entering {
+  transform: translateZ(100px);
+  opacity: 0;
+}
+
+/* ===== 無障礙設定 ===== */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+  }
+}
+
+/* ===== 觸控裝置優化 ===== */
+@media (hover: none) and (pointer: coarse) {
+  .btn {
+    min-height: 72px;
+  }
+  
+  .hotspot-3d {
+    min-width: 44px;
+    min-height: 44px;
+  }
+}
+
+/* ===== 滾動條樣式 ===== */
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(30, 30, 30, 0.5);
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.5);
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(140, 140, 140, 0.6);
+}
+
+/* ===== 選擇效果禁用 ===== */
+::selection {
+  background: rgba(16, 185, 129, 0.3);
+  color: white;
+}
+
+/* ===== 遊戲專用樣式 ===== */
+.game-container {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: #000;
+}
+
+.game-layer {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+}
+
+.game-layer--interactive {
+  pointer-events: auto;
+}
+
+/* ===== VHS 覆蓋層 ===== */
+.vhs-overlay {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 50;
+}
+
+.vhs-scanlines {
+  background: repeating-linear-gradient(
+    0deg,
+    transparent 0px,
+    transparent 1px,
+    rgba(0, 0, 0, 0.2) 1px,
+    rgba(0, 0, 0, 0.2) 2px
+  );
+}
+
+.vhs-noise {
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+}
+
+/* ===== 工具提示 ===== */
+.tooltip {
+  position: absolute;
+  padding: 4px 8px;
+  background: rgba(0, 0, 0, 0.9);
+  border: 1px solid rgba(100, 100, 100, 0.3);
+  border-radius: 4px;
+  font-size: 10px;
+  white-space: nowrap;
+  pointer-events: none;
+  z-index: 100;
+  transform: translateY(-100%) translateX(-50%);
+  animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-90%) translateX(-50%); }
+  to { opacity: 1; transform: translateY(-100%) translateX(-50%); }
+}
