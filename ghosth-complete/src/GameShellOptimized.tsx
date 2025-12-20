@@ -33,6 +33,15 @@ import { TemperatureSensor, EMFMeter, ThreatLevel } from "./components/Sensors";
 import { ToolButton, Toolbar, SpiritBar } from "./components/ToolbarButtons";
 import { TitleArchiveScreen } from "./components/TitleArchiveScreen";
 
+// 3D Effects
+import { 
+  Scene3DContainer, 
+  ParallaxLayer, 
+  ParticleField, 
+  Flashlight3D,
+  DepthOfField
+} from "./effects/Scene3DEffects";
+
 // Hooks
 import { useVHSTimestamp } from "./hooks/useVHSTimestamp";
 import { usePrefersReducedMotion } from "./hooks/usePrefersReducedMotion";
@@ -1157,52 +1166,84 @@ function GameShellInner() {
           className="absolute inset-0 pt-[85px] pb-[135px]"
           style={{ touchAction: "none" }}
         >
-          {/* 場景背景 */}
-          <div className="absolute inset-0">
-            <img
-              src={SCENES[sceneId].src}
-              alt={SCENES[sceneId].label}
-              draggable={false}
-              className="w-full h-full object-cover"
-              style={{
-                opacity: 0.92,
-                filter: `saturate(${1 - fearState.colorDesaturation})`,
-              }}
-            />
-            <div
-              className="absolute inset-0"
-              style={{
-                background: `rgba(0, 0, 0, ${0.35 + fearState.fearLevel * 0.003})`,
-              }}
-            />
-          </div>
+          {/* 3D 場景容器 */}
+          <Scene3DContainer 
+            intensity={0.4} 
+            mouseParallax={true} 
+            gyroEnabled={true}
+            reducedMotion={reducedMotion}
+          >
+            {/* 景深效果 */}
+            <DepthOfField 
+              focusPoint={pointer} 
+              blurAmount={2} 
+              enabled={activeMode === 'flashlight'}
+            >
+              {/* 背景視差層 (深度 -30) */}
+              <ParallaxLayer depth={-30} className="z-[1]">
+                {/* 場景背景 */}
+                <div className="absolute inset-0">
+                  <img
+                    src={SCENES[sceneId].src}
+                    alt={SCENES[sceneId].label}
+                    draggable={false}
+                    className="w-full h-full object-cover"
+                    style={{
+                      opacity: 0.92,
+                      filter: `saturate(${1 - fearState.colorDesaturation})`,
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0"
+                    style={{
+                      background: `rgba(0, 0, 0, ${0.35 + fearState.fearLevel * 0.003})`,
+                    }}
+                  />
+                </div>
+              </ParallaxLayer>
 
-          {/* 互動熱點 */}
-          {currentHotspots.map((hotspot) => (
-            <InteractiveHotspot
-              key={hotspot.id}
-              hotspot={hotspot}
-              onInteract={onHotspotInteract}
-              isFlashlightMode={activeMode === "flashlight"}
-              isVisible={!isTransitioning}
-            />
-          ))}
+              {/* 中景視差層 (深度 0) - 互動元素 */}
+              <ParallaxLayer depth={0} className="z-[10]">
+                {/* 互動熱點 */}
+                {currentHotspots.map((hotspot) => (
+                  <InteractiveHotspot
+                    key={hotspot.id}
+                    hotspot={hotspot}
+                    onInteract={onHotspotInteract}
+                    isFlashlightMode={activeMode === "flashlight"}
+                    isVisible={!isTransitioning}
+                  />
+                ))}
+              </ParallaxLayer>
 
-          {/* 手電筒效果 */}
-          {activeMode === "flashlight" && (
-            <div
-              className="absolute inset-0 pointer-events-none z-[44]"
-              style={{
-                background: `radial-gradient(
-                  ellipse 130px 170px at ${pointer.x}% ${pointer.y}%,
-                  rgba(255, 248, 220, 0.14) 0%,
-                  rgba(255, 248, 220, 0.05) 30%,
-                  rgba(0, 0, 0, 0.97) 100%
-                )`,
-              }}
-            />
-          )}
+              {/* 前景視差層 (深度 30) - 粒子和效果 */}
+              <ParallaxLayer depth={30} className="z-[12]">
+                {/* 3D 粒子系統 */}
+                {!reducedMotion && (
+                  <ParticleField 
+                    count={director.phase === 'incident' ? 60 : 40}
+                    type={director.phase === 'incident' ? 'spirits' : 'dust'}
+                    intensity={director.intensity01}
+                    reducedMotion={reducedMotion}
+                  />
+                )}
+              </ParallaxLayer>
 
+              {/* 手電筒 3D 效果 */}
+              {activeMode === "flashlight" && (
+                <Flashlight3D
+                  x={pointer.x}
+                  y={pointer.y}
+                  active={true}
+                  intensity={0.8}
+                />
+              )}
+
+              {/* 掃描效果 - 在 3D 容器外層 */}
+            </DepthOfField>
+          </Scene3DContainer>
+
+          {/* UI 覆蓋層 - 在 3D 外層，保持 2D */}
           {/* 掃描效果 */}
           {activeMode === "scan" && (
             <div className="absolute inset-0 pointer-events-none z-[44]">
