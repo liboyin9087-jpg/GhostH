@@ -1,0 +1,18 @@
+# 簡化版 Dockerfile - 假設已在本地構建
+# 使用方式：
+# 1. 在本地構建: cd 靈異連線_完整優化包_v3.2_Final/optimized-project && npm run build
+# 2. Docker 構建: docker build -f Dockerfile.simple -t ghosth .
+
+FROM nginx:alpine
+
+# 複製構建產物
+COPY 靈異連線_完整優化包_v3.2_Final/optimized-project/dist /usr/share/nginx/html
+
+# 複製 nginx 配置
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
+# 暴露 8080 端口（Cloud Run 預設）
+EXPOSE 8080
+
+# 啟動 nginx
+CMD ["nginx", "-g", "daemon off;"]
